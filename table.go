@@ -108,7 +108,7 @@ func (scr *spur) ChangeState(state string) {
 	scr.changeState.GetCell(0, 0).SetText(state)
 }
 
-func (scr *spur) IsStateAlter() bool {
+func (scr *spur) IsStateAlert() bool {
 	text := scr.changeState.GetCell(0, 0).Text
 	return (text != StateSaved)
 }

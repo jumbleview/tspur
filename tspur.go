@@ -13,8 +13,8 @@ import (
 // StateSaved is what to show when new data is in Table
 const StateSaved = "== Saved =="
 
-// StateAlter is waht to show when table is saved
-const StateAlter = "~ Changed ~"
+// StateAlert is waht to show when table is saved
+const StateAlert = "~ Changed ~"
 
 // Splash is visiting screen greeting
 const Splash = "" +

@@ -53,7 +53,7 @@ func (scr *spur) MakeList(app *tview.Application) error {
 									// Found!
 									scr.keys = append(scr.keys[:i], scr.keys[i+1:]...)
 									delete(scr.records, k)
-									scr.ChangeState(StateAlter)
+									scr.ChangeState(StateAlert)
 									break
 								}
 							}
@@ -127,11 +127,12 @@ func (scr *spur) MakeList(app *tview.Application) error {
 	}
 
 	lexit := func() {
-		if scr.IsStateAlter() {
+		if scr.IsStateAlert() {
 			modal := tview.NewModal().SetText("Table changed. Exit? Really?")
 			modal.AddButtons([]string{"No", "Yes"})
 			modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 				if buttonLabel == "Yes" {
+					clipboard.WriteAll("")
 					app.Stop()
 				} else {
 					scr.flex.RemoveItem(modal)
@@ -141,6 +142,7 @@ func (scr *spur) MakeList(app *tview.Application) error {
 			scr.flex.AddItem(modal, 20, 1, true)
 			app.SetFocus(modal)
 		} else {
+			clipboard.WriteAll("")
 			app.Stop()
 		}
 	}

@@ -88,7 +88,7 @@ func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 			scr.MakeTable(app)
 			scr.flex.AddItem(scr.table, 0, 2, false)
 			scr.form.Clear(true)
-			scr.ChangeState(StateAlter)
+			scr.ChangeState(StateAlert)
 		}
 		scr.table.SetSelectable(true, true)
 		app.SetFocus(scr.table)
