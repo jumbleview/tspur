@@ -13,7 +13,13 @@ func (scr *spur) MakeList(app *tview.Application) error {
 	lnavigate := func() {
 		scr.table.SetBorders(true).SetSelectable(true, true)
 		app.SetFocus(scr.table)
-		cell := scr.table.GetCell(scr.table.GetSelection())
+		row, col := scr.table.GetSelection()
+		if row < 1 || col < 1 {
+			row = 1
+			col = 1
+		}
+		cell := scr.table.GetCell(row, col)
+
 		clipboard.WriteAll(cell.Text)
 	}
 	modify := func() {
@@ -40,7 +46,7 @@ func (scr *spur) MakeList(app *tview.Application) error {
 	delete := func() {
 		if len(scr.keys) > 0 {
 			if scr.activeRow >= 0 {
-				k := scr.keys[scr.activeRow]
+				k := scr.keys[scr.activeRow-1]
 				ttl := "Delete " + k + "?"
 				modal := tview.NewModal().SetText(ttl)
 				modal.AddButtons([]string{"Yes", "No"})
@@ -101,7 +107,7 @@ func (scr *spur) MakeList(app *tview.Application) error {
 		}
 		if len(csv) > 0 {
 			//crib.Write([]byte(csv))
-			err := EncryptFile(CribName, []byte(csv), scr.passwd)
+			err := EncryptFile(scr.cribName, []byte(csv), scr.passwd)
 			if err != nil {
 				panic(err.Error())
 			}

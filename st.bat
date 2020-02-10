@@ -1,1 +1,3 @@
-C:\softprj\Go\src\tspur\tspur.exe C:\Users\gregb\shpargalka
+tspur.exe shpargalka
+pause
+
