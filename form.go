@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/atotto/clipboard"
+	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
 
@@ -29,6 +30,7 @@ func CompoundModal(p tview.Primitive, width, height int) tview.Primitive {
 // MakeForm makes screen  Form to to insert/modify table record
 func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 	scr.form = tview.NewForm()
+	scr.form.SetFieldBackgroundColor(tcell.ColorDarkCyan)
 	scr.form.SetBorder(true)
 	count := scr.width
 	var k string
@@ -95,6 +97,7 @@ func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 			keyPlace := scr.UpdateRecords(k, v, presentation)
 			scr.UpdateTable(app)
 			scr.table.Select(keyPlace+1, 1)
+			scr.topMenu.GetButton(4).SetLabel("Save!")
 			//scr.ChangeState(StateAlert)
 		}
 	}
@@ -159,6 +162,27 @@ func (scr *spur) MakeSaveForm(app *tview.Application, vsbl string) error {
 	dropDown = append(dropDown, scr.cribName+" ?")
 	scr.form.AddDropDown("Save the page:", dropDown, 0, nil)
 	scr.form.AddButton("Save", func() {
+		scr.Save()
+		scr.form.Clear(true)
+		scr.root.RemovePage(ModalName)
+		app.SetFocus(scr.topMenu)
+	})
+	scr.form.AddButton("Cancel", func() {
+		scr.form.Clear(true)
+		scr.root.RemovePage(ModalName)
+		app.SetFocus(scr.topMenu)
+	})
+	return nil
+}
+
+// MakeSaveForm makes screen  Form to apporve saving of the changed page
+func (scr *spur) MakeNewPasswordForm(app *tview.Application) error {
+	scr.form = tview.NewForm()
+	scr.form.AddPasswordField("Old Password:", "", 21, '*', nil)
+	scr.form.AddPasswordField("New Password:", "", 21, '*', nil)
+	scr.form.AddPasswordField("New Password:", "", 21, '*', nil)
+
+	scr.form.AddButton("Submit", func() {
 		scr.Save()
 		scr.form.Clear(true)
 		scr.root.RemovePage(ModalName)
