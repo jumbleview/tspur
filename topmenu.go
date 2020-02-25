@@ -19,54 +19,6 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		return event
 	})
 	scr.topMenu.SetButtonBackgroundColor(tcell.ColorDarkBlue)
-	//	submit := func() {
-	// 	if len(k) > 0 {
-	// 		_, ok := scr.records[k]
-	// 		if !ok {
-	// 			scr.keys = append(scr.keys, k)
-	// 		}
-	// 		for j := len(v) - 1; j >= 0; j-- {
-	// 			if len(v[j]) > 0 {
-	// 				break
-	// 			}
-	// 			v = v[:j]
-	// 		}
-	// 		if len(v) > scr.width {
-	// 			scr.width = len(v)
-	// 		}
-	// 		scr.records[k] = v
-	// 		scr.visibility[k] = vsbl
-	// 		scr.table.Clear()
-	// 		scr.flex.RemoveItem(scr.table)
-	// 		scr.MakeTable(app)
-	// 		scr.flex.AddItem(scr.table, 0, 2, false)
-	// 		scr.form.Clear(true)
-	// 		scr.ChangeState(StateAlert)
-	// 	}
-	// scr.table.SetSelectable(true, true)
-	// app.SetFocus(scr.table)
-	// for ix, key := range scr.keys {
-	// 	if key == k {
-	// 		scr.table.Select(ix, 0)
-	// 		break
-	// 	}
-	// }
-	//	cell := scr.table.GetCell(scr.table.GetSelection())
-	//	clipboard.WriteAll(cell.Text)
-	//}
-	// cancel := func() {
-	// 	scr.table.SetSelectable(true, true)
-	// 	app.SetFocus(scr.table)
-	// 	for ix, key := range scr.keys {
-	// 		if key == k {
-	// 			scr.table.Select(ix, 0)
-	// 			break
-	// 		}
-	// 	}
-	// 	scr.form.Clear(true)
-	// 	cell := scr.table.GetCell(scr.table.GetSelection())
-	// 	clipboard.WriteAll(cell.Text)
-	// }
 	fselect := func() {
 		scr.table.SetSelectable(true, true)
 		app.SetFocus(scr.table)
@@ -108,6 +60,10 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 
 	scr.topMenu.AddButton("Delete", func() {
 		modal := tview.NewModal()
+		modal.SetBackgroundColor(tcell.ColorDarkCyan)
+		modal.SetButtonBackgroundColor(tcell.ColorDarkCyan)
+		modal.SetTextColor(tcell.ColorWhite)
+		modal.SetButtonTextColor(tcell.ColorWhite)
 		var key string
 		if scr.activeRow > 0 {
 			key = scr.keys[scr.activeRow-1]
@@ -142,7 +98,11 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 	scr.topMenu.AddButton("Save", func() {
 		//scr.MakeSaveForm(app, "")
 		modal := tview.NewModal()
-		modal.SetText("Save " + scr.cribName + "?")
+		modal.SetBackgroundColor(tcell.ColorDarkCyan)
+		modal.SetButtonBackgroundColor(tcell.ColorDarkCyan)
+		modal.SetTextColor(tcell.ColorWhite)
+		modal.SetButtonTextColor(tcell.ColorWhite)
+		modal.SetText("Save page?")
 		modal.AddButtons([]string{"Save", "Cancel"})
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Save" {
@@ -158,16 +118,7 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		app.SetFocus(modal)
 	})
 	scr.topMenu.AddButton("Password", func() {
-		scr.MakeNewPasswordForm(app)
-		pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
-		pwdFlex.AddItem(scr.form, 0, 2, true)
-		pwdFlex.SetBackgroundColor(tcell.ColorBlue)
-		pwdFlex.SetBorder(true) // In case of true border is on black background
-		//pwdFlex.SetBorderPadding(2, 2, 2, 2)
-		modal := CompoundModal(pwdFlex, 28, 14)
-		scr.root = scr.root.AddPage(ModalName, modal, true, true)
-		app.SetRoot(scr.root, true)
-		app.SetFocus(modal)
+		scr.MakeNewPasswordForm(app, " Change page password ")
 	})
 
 	fexit := func() {

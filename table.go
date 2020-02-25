@@ -43,14 +43,14 @@ func (scr *spur) UpdateRecords(key string, values []string, visibility string) i
 func (scr *spur) UpdateTable(app *tview.Application) error {
 	scr.table.Clear().SetBorders(true)
 	scr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("#%d", len(scr.records))).
-		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
+		SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	scr.table.SetCell(0, 1, tview.NewTableCell("Record Name").
-		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
+		SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	for c := 0; c < scr.width; c++ {
 		scr.table.SetCell(0, c+2, tview.NewTableCell(fmt.Sprintf("Field %d", c)).
-			SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
+			SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
 			SetSelectable(false))
 	}
 	for r := 0; r < len(scr.keys); r++ {
@@ -59,7 +59,7 @@ func (scr *spur) UpdateTable(app *tview.Application) error {
 			SetTextColor(tcell.ColorWhite).
 			SetAlign(tview.AlignCenter).SetSelectable(false))
 		scr.table.SetCell(r+1, 1, tview.NewTableCell(key).
-			SetTextColor(tcell.ColorWhite).
+			SetTextColor(tcell.ColorYellow).
 			SetAlign(tview.AlignCenter).SetSelectable(true))
 		values := scr.records[key]
 		for c := 0; c < scr.width; c++ {
@@ -72,7 +72,7 @@ func (scr *spur) UpdateTable(app *tview.Application) error {
 				tblValue = strings.Repeat("*", len(value))
 			}
 			scr.table.SetCell(r+1, c+2, tview.NewTableCell(tblValue).
-				SetTextColor(tcell.ColorWhite).
+				SetTextColor(tcell.ColorYellow).
 				SetAlign(tview.AlignCenter).SetSelectable(true))
 		}
 	}
@@ -89,6 +89,7 @@ func (scr *spur) MakeTable(app *tview.Application) error {
 		}
 	}
 	scr.table = tview.NewTable().SetBorders(true)
+	scr.table.SetBordersColor(tcell.ColorYellow)
 	err := scr.UpdateTable(app)
 	if err != nil {
 		return err
@@ -145,23 +146,4 @@ func (scr *spur) MakeTable(app *tview.Application) error {
 	scr.table.SetFixed(1, 1)
 
 	return nil
-}
-
-func (scr *spur) MakeChangeState() error {
-	scr.changeState = tview.NewTable().SetBorders(false)
-	scr.changeState.SetCell(0, 0,
-		tview.NewTableCell(StateSaved).
-			SetTextColor(tcell.ColorWhite).
-			SetAlign(tview.AlignCenter))
-	scr.changeState.SetSelectable(false, false)
-	return nil
-}
-
-func (scr *spur) ChangeState(state string) {
-	scr.changeState.GetCell(0, 0).SetText(state)
-}
-
-func (scr *spur) IsStateAlert() bool {
-	text := scr.changeState.GetCell(0, 0).Text
-	return (text != StateSaved)
 }

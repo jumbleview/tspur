@@ -27,10 +27,20 @@ func CompoundModal(p tview.Primitive, width, height int) tview.Primitive {
 		AddItem(nil, 0, 1, false)
 }
 
+// SetFormColors sets colors defining form theme
+func SetFormColors(form *tview.Form, background, field, font tcell.Color) {
+	form.SetBackgroundColor(background)
+	form.SetButtonBackgroundColor(background)
+	form.SetFieldBackgroundColor(field)
+	form.SetButtonTextColor(font)
+	form.SetFieldTextColor(font)
+	form.SetLabelColor(font)
+}
+
 // MakeForm makes screen  Form to to insert/modify table record
 func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 	scr.form = tview.NewForm()
-	scr.form.SetFieldBackgroundColor(tcell.ColorDarkCyan)
+	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
 	scr.form.SetBorder(true)
 	count := scr.width
 	var k string
@@ -149,10 +159,7 @@ func (scr *spur) Save() {
 		if err != nil {
 			panic(err.Error())
 		}
-		//scr.ChangeState(StateSaved)
 	}
-	//app.Stop()
-	//lnavigate()
 }
 
 // MakeSaveForm makes screen  Form to apporve saving of the changed page
@@ -176,22 +183,56 @@ func (scr *spur) MakeSaveForm(app *tview.Application, vsbl string) error {
 }
 
 // MakeSaveForm makes screen  Form to apporve saving of the changed page
-func (scr *spur) MakeNewPasswordForm(app *tview.Application) error {
+func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string) error {
 	scr.form = tview.NewForm()
-	scr.form.AddPasswordField("Old Password:", "", 21, '*', nil)
-	scr.form.AddPasswordField("New Password:", "", 21, '*', nil)
-	scr.form.AddPasswordField("New Password:", "", 21, '*', nil)
+	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
+	var oldPasswd, passwd1, passwd2 string
+	createInputs := func() {
+		scr.form.AddPasswordField("Old Password:", "", 21, '*', func(s string) {
+			oldPasswd = s
+		})
+		scr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
+			passwd1 = s
+		})
+		scr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
+			passwd2 = s
+		})
+	}
+	pwdSubmit := func() {
+		if oldPasswd == scr.passwd && passwd1 == passwd2 {
+			scr.passwd = passwd1
+			scr.Save()
+			scr.form.Clear(true)
+			scr.root.RemovePage(ModalName)
+			app.SetFocus(scr.topMenu)
+		} else {
+			scr.form.Clear(true)
+			scr.root.RemovePage(ModalName)
+			title := " New passwords do not math. Repeat "
+			if oldPasswd != scr.passwd {
+				title = " Wrong old password. Repeat "
+			}
+			scr.MakeNewPasswordForm(app, title)
+		}
+	}
+	createInputs()
+	cancel := func() {
+		scr.form.Clear(true)
+		scr.root.RemovePage(ModalName)
+		app.SetFocus(scr.topMenu)
+	}
+	scr.form.AddButton("Submit", pwdSubmit)
+	scr.form.AddButton("Cancel", cancel)
+	scr.form.SetCancelFunc(cancel)
 
-	scr.form.AddButton("Submit", func() {
-		scr.Save()
-		scr.form.Clear(true)
-		scr.root.RemovePage(ModalName)
-		app.SetFocus(scr.topMenu)
-	})
-	scr.form.AddButton("Cancel", func() {
-		scr.form.Clear(true)
-		scr.root.RemovePage(ModalName)
-		app.SetFocus(scr.topMenu)
-	})
+	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
+	pwdFlex.AddItem(scr.form, 0, 2, true)
+	pwdFlex.SetBackgroundColor(tcell.ColorDarkCyan)
+	pwdFlex.SetTitle(title)
+	pwdFlex.SetBorder(true) // In case of true border is on black background
+	modal := CompoundModal(pwdFlex, 40, 11)
+	scr.root = scr.root.AddPage(ModalName, modal, true, true)
+	app.SetRoot(scr.root, true)
+	app.SetFocus(modal)
 	return nil
 }

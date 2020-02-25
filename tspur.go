@@ -188,9 +188,10 @@ func main() {
 		fmt.Fprintf(pwdTitle, prompt)
 		pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 		pwdFlex.AddItem(pwdTitle, 0, 1, false).AddItem(pwdform, 0, 2, true)
-		pwdFlex.SetBackgroundColor(tcell.ColorBlue)
+		pwdFlex.SetBackgroundColor(tcell.ColorDarkBlue)
 		pwdFlex.SetBorder(true) // In case of true border is on black background
-		modal := CompoundModal(pwdFlex, 20, 9)
+		pwdFlex.SetBorderPadding(1, 1, 1, 1)
+		modal := CompoundModal(pwdFlex, 28, 13)
 		scr.root = scr.root.AddPage("password", modal, true, true)
 		app.SetRoot(scr.root, true)
 	}
@@ -211,6 +212,8 @@ func main() {
 			}
 		})
 	} else { // path does exist: ask old password
+		pwdform.SetFieldBackgroundColor(tcell.ColorDarkCyan)
+		pwdform.SetButtonBackgroundColor(tcell.ColorDarkBlue)
 		submitLabel := (" submit ")
 		pwdform.AddPasswordField(">>", "", len(submitLabel)+2, '*', pwdInput)
 		pwdform.AddButton(submitLabel, func() {
