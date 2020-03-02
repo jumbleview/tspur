@@ -79,6 +79,61 @@ func (scr *spur) UpdateTable(app *tview.Application) error {
 	return nil
 }
 
+// MakeBaseTable makes table to visualise at program start and assignes methods
+func (scr *spur) MakeBaseTable(app *tview.Application) {
+	scr.table = tview.NewTable().SetBorders(true)
+	scr.table.SetBordersColor(tcell.ColorYellow)
+	// Making table title
+	scr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("#24")).
+		SetTextColor(tcell.ColorYellow).SetSelectable(false))
+	scr.table.SetCell(0, 1, tview.NewTableCell("Record Name").
+		SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
+		SetSelectable(false))
+	for i := 0; i < 3; i++ {
+		scr.table.SetCell(0, i+2, tview.NewTableCell(fmt.Sprintf("Field %d", i)).
+			SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
+			SetSelectable(false))
+	}
+	// Making table body
+	const cellText = " **************** "
+	const hight = 24
+	const width = 3
+	for r := 0; r < hight; r++ {
+		scr.table.SetCell(r+1, 0, tview.NewTableCell(fmt.Sprintf("%d", r+1)).
+			SetTextColor(tcell.ColorYellow).
+			SetAlign(tview.AlignCenter).SetSelectable(false))
+		for j := 1; j <= width; j++ {
+			scr.table.SetCell(r+1, j, tview.NewTableCell(cellText).
+				SetTextColor(tcell.ColorYellow).
+				SetAlign(tview.AlignCenter).SetSelectable(true))
+		}
+	}
+	scr.table.SetSelectedFunc(func(row int, column int) {
+		cell := scr.table.GetCell(row, column)
+		cell.SetTextColor(tcell.ColorRed)
+		if len(scr.records) > 0 {
+			//toClipBoard(row, column)
+		}
+		scr.activeRow = row
+		scr.activeColumn = column
+	})
+	scr.table.SetSelectionChangedFunc(func(row int, column int) {
+		if (row < 1) || (column < 1) {
+			return
+		}
+		scr.activeRow = row
+		scr.activeColumn = column
+	})
+	scr.table.SetDoneFunc(func(key tcell.Key) {
+		if key == tcell.KeyEnter {
+		} else if key == tcell.KeyEscape {
+			scr.table.SetSelectable(false, false)
+			app.SetFocus(scr.topMenu)
+		}
+	})
+	scr.table.SetFixed(1, 1)
+}
+
 // MakeTable makes table out of parsed data
 func (scr *spur) MakeTable(app *tview.Application) error {
 	sort.Strings(scr.keys)

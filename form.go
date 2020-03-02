@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
@@ -154,12 +155,12 @@ func (scr *spur) Save() {
 		line += "\n"
 		csv += line
 	}
-	if len(csv) > 0 {
-		err := EncryptFile(scr.cribName, []byte(csv), scr.passwd)
-		if err != nil {
-			panic(err.Error())
-		}
+	//if len(csv) > 0 {
+	err := EncryptFile(scr.cribName, []byte(csv), scr.passwd)
+	if err != nil {
+		panic(err.Error())
 	}
+	//}
 }
 
 // MakeSaveForm makes screen  Form to apporve saving of the changed page
@@ -182,15 +183,17 @@ func (scr *spur) MakeSaveForm(app *tview.Application, vsbl string) error {
 	return nil
 }
 
-// MakeSaveForm makes screen  Form to apporve saving of the changed page
-func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string) error {
+// MakeNewPasswordForm makes screen  Form to change page password
+func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needOldPassword bool) error {
 	scr.form = tview.NewForm()
 	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
 	var oldPasswd, passwd1, passwd2 string
 	createInputs := func() {
-		scr.form.AddPasswordField("Old Password:", "", 21, '*', func(s string) {
-			oldPasswd = s
-		})
+		if needOldPassword {
+			scr.form.AddPasswordField("Old Password:", "", 21, '*', func(s string) {
+				oldPasswd = s
+			})
+		}
 		scr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
 			passwd1 = s
 		})
@@ -212,7 +215,7 @@ func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string) error
 			if oldPasswd != scr.passwd {
 				title = " Wrong old password. Repeat "
 			}
-			scr.MakeNewPasswordForm(app, title)
+			scr.MakeNewPasswordForm(app, title, needOldPassword)
 		}
 	}
 	createInputs()
@@ -231,6 +234,69 @@ func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string) error
 	pwdFlex.SetTitle(title)
 	pwdFlex.SetBorder(true) // In case of true border is on black background
 	modal := CompoundModal(pwdFlex, 40, 11)
+	scr.root = scr.root.AddPage(ModalName, modal, true, true)
+	app.SetRoot(scr.root, true)
+	app.SetFocus(modal)
+	return nil
+}
+
+// MakeEnterPasswordForm makes screen page with Form to enter page password
+func (scr *spur) MakeEnterPasswordForm(app *tview.Application, title string) error {
+	scr.form = tview.NewForm()
+	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
+	var passwd string
+	createInputs := func() {
+		scr.form.AddPasswordField(">>", "", 21, '*', func(s string) {
+			passwd = s
+		})
+	}
+	pwdSubmit := func() {
+		data, err := DecryptFile(scr.cribName, passwd)
+		if err == nil {
+			scr.passwd = passwd
+			var sdata []string
+			if len(data) > 0 {
+				sdata = strings.Split(string(data), "\n")
+			}
+			for _, s := range sdata {
+				// parse string as csv
+				elems := strings.Split(s, ",")
+				if len(elems) > 1 {
+					values := elems[2:]
+					scr.keys = append(scr.keys, elems[1])
+					if len(values) > scr.width {
+						scr.width = len(values)
+					}
+					scr.records[elems[1]] = values
+					scr.visibility[elems[1]] = elems[0]
+				}
+			}
+			scr.UpdateTable(app)
+			scr.form.Clear(true)
+			scr.root.RemovePage(ModalName)
+			app.SetFocus(scr.topMenu)
+		} else {
+			scr.form.Clear(true)
+			scr.root.RemovePage(ModalName)
+			title = " Wrong password. Repeat "
+			scr.MakeEnterPasswordForm(app, title)
+		}
+	}
+	createInputs()
+	cancel := func() {
+		app.Stop()
+		return
+	}
+	scr.form.AddButton("Submit", pwdSubmit)
+	scr.form.AddButton("Cancel", cancel)
+	scr.form.SetCancelFunc(cancel)
+
+	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
+	pwdFlex.AddItem(scr.form, 0, 2, true)
+	pwdFlex.SetBackgroundColor(tcell.ColorDarkCyan)
+	pwdFlex.SetTitle(title)
+	pwdFlex.SetBorder(true) // In case of true border is on black background
+	modal := CompoundModal(pwdFlex, 40, 8)
 	scr.root = scr.root.AddPage(ModalName, modal, true, true)
 	app.SetRoot(scr.root, true)
 	app.SetFocus(modal)

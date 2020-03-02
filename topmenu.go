@@ -118,7 +118,8 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		app.SetFocus(modal)
 	})
 	scr.topMenu.AddButton("Password", func() {
-		scr.MakeNewPasswordForm(app, " Change page password ")
+		needOldPassword := true
+		scr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)
 	})
 
 	fexit := func() {
