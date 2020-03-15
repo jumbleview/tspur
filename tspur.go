@@ -19,11 +19,11 @@ const ModeClipEnter = "Clipboard-on-Enter"
 // ModeClipSelect means cell text copied when selected
 const ModeClipSelect = "Clipboard-on-Select"
 
-// ModeVisualEnter means cell made visual when Enter pressed
-const ModeVisualEnter = "Visual-on-Enter"
+// ModeVisibleEnter means cell made visual when Enter pressed
+const ModeVisibleEnter = "Visible-on-Enter"
 
-// ModeVisualSelect means cell mode visual when selected
-const ModeVisualSelect = "Visual-on-Select"
+// ModeVisibleSelect means cell mode visual when selected
+const ModeVisibleSelect = "Visible-on-Select"
 
 // spur contains all content of the tspur
 type spur struct {

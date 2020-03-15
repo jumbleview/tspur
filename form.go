@@ -152,8 +152,8 @@ func (scr *spur) MakeModeForm(app *tview.Application) error {
 	var dropDown []string
 	dropDown = append(dropDown, ModeClipEnter)
 	dropDown = append(dropDown, ModeClipSelect)
-	dropDown = append(dropDown, ModeVisualEnter)
-	dropDown = append(dropDown, ModeVisualSelect)
+	dropDown = append(dropDown, ModeVisibleEnter)
+	dropDown = append(dropDown, ModeVisibleSelect)
 	i := 0
 	for ; i < len(dropDown); i++ {
 		if dropDown[i] == scr.mode {
@@ -201,11 +201,11 @@ func (scr *spur) MakeModeList(app *tview.Application) error {
 	modes.AddItem(ModeClipSelect, "", '2', func() {
 		scr.mode = ModeClipSelect
 	})
-	modes.AddItem(ModeVisualEnter, "", '3', func() {
-		scr.mode = ModeVisualEnter
+	modes.AddItem(ModeVisibleEnter, "", '3', func() {
+		scr.mode = ModeVisibleEnter
 	})
-	modes.AddItem(ModeVisualSelect, "", '3', func() {
-		scr.mode = ModeVisualSelect
+	modes.AddItem(ModeVisibleSelect, "", '3', func() {
+		scr.mode = ModeVisibleSelect
 	})
 
 	modes.AddItem("    OK     ", "", ' ', func() {
@@ -231,7 +231,7 @@ func (scr *spur) MakeModeList(app *tview.Application) error {
 
 // MakeModeTable makes modal  table to choose Mode
 func (scr *spur) MakeModeTable(app *tview.Application) error {
-	modesSet := [4]string{ModeClipEnter, ModeClipSelect, ModeVisualEnter, ModeVisualSelect}
+	modesSet := [4]string{ModeClipEnter, ModeClipSelect, ModeVisibleEnter, ModeVisibleSelect}
 	scr.modes = tview.NewTable().SetBorders(false)
 
 	scr.modes.SetCell(0, 0, tview.NewTableCell(ModeClipEnter).
@@ -242,10 +242,10 @@ func (scr *spur) MakeModeTable(app *tview.Application) error {
 		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
 		SetBackgroundColor(tcell.ColorDarkCyan).SetSelectable(true))
 
-	scr.modes.SetCell(2, 0, tview.NewTableCell(ModeVisualEnter).
+	scr.modes.SetCell(2, 0, tview.NewTableCell(ModeVisibleEnter).
 		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
 		SetBackgroundColor(tcell.ColorDarkCyan).SetSelectable(true))
-	scr.modes.SetCell(3, 0, tview.NewTableCell(ModeVisualSelect).
+	scr.modes.SetCell(3, 0, tview.NewTableCell(ModeVisibleSelect).
 		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
 		SetBackgroundColor(tcell.ColorDarkCyan).SetSelectable(true))
 

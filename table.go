@@ -179,9 +179,9 @@ func (scr *spur) MakeBaseTable(app *tview.Application) {
 		case ModeClipEnter:
 			scr.ToClipBoard(row, column)
 		case ModeClipSelect: // nothing to do
-		case ModeVisualEnter:
+		case ModeVisibleEnter:
 			scr.Visualize(row, column)
-		case ModeVisualSelect: // nothing to do
+		case ModeVisibleSelect: // nothing to do
 		}
 		scr.activeRow = row
 		scr.activeColumn = column
@@ -193,10 +193,10 @@ func (scr *spur) MakeBaseTable(app *tview.Application) {
 		switch scr.mode {
 		case ModeClipSelect:
 			scr.ToClipBoard(row, column)
-		case ModeVisualSelect:
+		case ModeVisibleSelect:
 			scr.Visualize(row, column)
 			fallthrough
-		case ModeVisualEnter:
+		case ModeVisibleEnter:
 			scr.Hide(scr.activeRow, scr.activeColumn)
 		}
 		scr.activeRow = row

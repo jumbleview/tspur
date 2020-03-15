@@ -6,7 +6,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-// MakeTopMenu makes application top menu order actions with table
+// MakeTopMenu makes application top menu to navigate/manipulate table
 func (scr *spur) MakeTopMenu(app *tview.Application) error {
 	scr.topMenu = tview.NewForm()
 	scr.topMenu.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -30,7 +30,7 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		//cell := scr.table.GetCell(row, col)
 		scr.activeRow = row
 		scr.activeColumn = col
-		if scr.mode == ModeVisualSelect {
+		if scr.mode == ModeVisibleSelect {
 			scr.Visualize(row, col)
 		} else if scr.mode == ModeClipSelect {
 			scr.ToClipBoard(row, col)
