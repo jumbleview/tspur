@@ -10,7 +10,8 @@ import (
 	"io/ioutil"
 	"os"
 )
-
+// Credit for code below is given to 
+// https://www.thepolyglotdeveloper.com/2018/02/encrypt-decrypt-data-golang-application-crypto-packages/
 func createHash(key string) string {
 	hasher := md5.New()
 	hasher.Write([]byte(key))

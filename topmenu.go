@@ -30,6 +30,9 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		//cell := scr.table.GetCell(row, col)
 		scr.activeRow = row
 		scr.activeColumn = col
+		if scr.mode == ModeVisualSelect {
+			scr.Visualize(row, col)
+		}
 		//clipboard.WriteAll(cell.Text)
 	}
 	scr.topMenu.AddButton("Select", fselect)
@@ -84,10 +87,14 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 				}
 				scr.activeColumn = 1
 				scr.UpdateTable(app)
+				scr.root.RemovePage(ModalName)
+				scr.table.SetSelectable(true, true)
+				app.SetFocus(scr.table)
+				scr.topMenu.GetButton(4).SetLabel("Save!")
+			} else {
+				scr.root.RemovePage(ModalName)
+				app.SetFocus(scr.topMenu)
 			}
-			scr.root.RemovePage(ModalName)
-			scr.table.SetSelectable(true, true)
-			app.SetFocus(scr.table)
 		})
 		modalo := CompoundModal(modal, 15, 5)
 		scr.root = scr.root.AddPage(ModalName, modalo, true, true)
@@ -117,6 +124,10 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		app.SetRoot(scr.root, true)
 		app.SetFocus(modal)
 	})
+	scr.topMenu.AddButton("Mode", func() {
+		scr.MakeModeTable(app)
+	})
+
 	scr.topMenu.AddButton("Password", func() {
 		needOldPassword := true
 		scr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)

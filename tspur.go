@@ -13,32 +13,17 @@ import (
 // ModalName is string assigned to the page with Modal dialog
 const ModalName = "modal"
 
-// StateSaved is what to show when new data is in Table
-const StateSaved = "== Saved =="
+// ModeClipEnter means cell text copied into clipboard when Enter pressed
+const ModeClipEnter = "Clipboard-on-Enter"
 
-// StateAlert is waht to show when table is saved
-const StateAlert = "~ Changed ~"
+// ModeClipSelect means cell text copied when selected
+const ModeClipSelect = "Clipboard-on-Select"
 
-// Splash is visiting screen greeting
-const Splash = "" +
-	"                               SSS\n" +
-	"                              S   S\n" +
-	"                             S     S\n" +
-	"                             S\n" +
-	"                   t         S\n" +
-	"                   t          S\n" +
-	"                   t            S\n" +
-	"                 ttttt           S         pppppp     u     u    r  r r r\n" +
-	"                   t               S       p     p    u     u    r r r r  \n" +
-	"                   t                S      p     p    u     u    r        \n" +
-	"                   t                S      p     p    u     u    r        \n" +
-	"                   t          S     S      p     p    u     u    r        \n" +
-	"                   t  t        S   S       p     p    u     u    r        \n" +
-	"                    tt          SSS        pppppp      uuuuu u   r        \n" +
-	"                                           p                              \n" +
-	"                                           p                              \n" +
-	"                                           p                              \n" +
-	"                                           p                              \n"
+// ModeVisualEnter means cell made visual when Enter pressed
+const ModeVisualEnter = "Visual-on-Enter"
+
+// ModeVisualSelect means cell mode visual when selected
+const ModeVisualSelect = "Visual-on-Select"
 
 // spur contains all content of the tspur
 type spur struct {
@@ -48,6 +33,7 @@ type spur struct {
 	topMenu *tview.Form  // tp menu for the application
 	form    *tview.Form  // form used for input/modification of records
 	table   *tview.Table // table with records
+	modes   *tview.Table // table to select mode
 	// to be deleted
 
 	lstFlx      *tview.Flex
@@ -63,6 +49,7 @@ type spur struct {
 	passwd       string
 	passwd2      string
 	cribName     string
+	mode         string
 }
 
 var scr spur
@@ -88,7 +75,8 @@ func main() {
 	}
 	tview.Styles.PrimitiveBackgroundColor = tcell.ColorDarkBlue
 	tview.Styles.PrimaryTextColor = tcell.ColorYellow
-
+	//tview.Styles.SecondaryTextColor = tcell.ColorWhite
+	//tview.Styles.TertiaryTextColor = tcell.ColorWhite
 	app := tview.NewApplication()
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -115,7 +103,7 @@ func main() {
 	scr.root = scr.root.AddPage("table", scr.flex, true, true)
 	app.SetFocus(scr.flex)
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if !scr.table.HasFocus() {
+		if !scr.table.HasFocus() && !scr.modes.HasFocus() {
 			if event.Key() == tcell.KeyRight || event.Key() == tcell.KeyDown {
 				return tcell.NewEventKey(tcell.KeyTab, 0x09, 0)
 			}
