@@ -36,9 +36,9 @@ type spur struct {
 	modes   *tview.Table // table to select mode
 	// to be deleted
 
-	lstFlx      *tview.Flex
-	list        *tview.List
-	changeState *tview.Table
+	lstFlx *tview.Flex
+	list   *tview.List
+
 	// screen underline data
 	keys         []string
 	records      map[string][]string
@@ -50,6 +50,7 @@ type spur struct {
 	passwd2      string
 	cribName     string
 	mode         string
+	saveMenuInx  int
 }
 
 var scr spur

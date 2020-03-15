@@ -88,7 +88,7 @@ func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 			keyPlace := scr.UpdateRecords(k, v, presentation)
 			scr.UpdateTable(app)
 			scr.table.Select(keyPlace+1, 1)
-			scr.topMenu.GetButton(4).SetLabel("Save!")
+			scr.topMenu.GetButton(scr.saveMenuInx).SetLabel("Save!")
 		}
 	}
 	cancel := func() {

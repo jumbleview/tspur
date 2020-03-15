@@ -6,7 +6,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-// MakeForm makes screen  Form to to insert/modify table record
+// MakeTopMenu makes application top menu order actions with table
 func (scr *spur) MakeTopMenu(app *tview.Application) error {
 	scr.topMenu = tview.NewForm()
 	scr.topMenu.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -32,10 +32,15 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		scr.activeColumn = col
 		if scr.mode == ModeVisualSelect {
 			scr.Visualize(row, col)
+		} else if scr.mode == ModeClipSelect {
+			scr.ToClipBoard(row, col)
 		}
-		//clipboard.WriteAll(cell.Text)
 	}
 	scr.topMenu.AddButton("Select", fselect)
+
+	scr.topMenu.AddButton("Mode", func() {
+		scr.MakeModeTable(app)
+	})
 
 	addHidden := func() {
 		scr.activeRow = -1
@@ -90,7 +95,7 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 				scr.root.RemovePage(ModalName)
 				scr.table.SetSelectable(true, true)
 				app.SetFocus(scr.table)
-				scr.topMenu.GetButton(4).SetLabel("Save!")
+				scr.topMenu.GetButton(scr.saveMenuInx).SetLabel("Save!")
 			} else {
 				scr.root.RemovePage(ModalName)
 				app.SetFocus(scr.topMenu)
@@ -114,7 +119,7 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Save" {
 				scr.Save()
-				scr.topMenu.GetButton(4).SetLabel("Save")
+				scr.topMenu.GetButton(scr.saveMenuInx).SetLabel("Save")
 			}
 			scr.root.RemovePage(ModalName)
 			app.SetFocus(scr.topMenu)
@@ -123,9 +128,6 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		scr.root = scr.root.AddPage(ModalName, modalo, true, true)
 		app.SetRoot(scr.root, true)
 		app.SetFocus(modal)
-	})
-	scr.topMenu.AddButton("Mode", func() {
-		scr.MakeModeTable(app)
 	})
 
 	scr.topMenu.AddButton("Password", func() {
@@ -139,5 +141,6 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 	}
 
 	scr.topMenu.AddButton("Exit", fexit)
+	scr.saveMenuInx = scr.topMenu.GetButtonIndex("Save")
 	return nil
 }
