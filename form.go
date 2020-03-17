@@ -307,6 +307,9 @@ func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 			scr.passwd = passwd1
 			scr.Save()
 			scr.form.Clear(true)
+			if !needOldPassword { // this is case of creating new page
+				scr.UpdateTable(app)
+			}
 			scr.root.RemovePage(ModalName)
 			app.SetFocus(scr.topMenu)
 		} else {
