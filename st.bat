@@ -1,3 +1,3 @@
-tspur.exe shpargalka
+tspur.exe cribsheet
 pause
 

@@ -39,7 +39,6 @@ func (scr *spur) Hide(row int, column int) {
 	values := scr.records[key]
 	if column < len(values)+2 {
 		scr.table.GetCell(row, column).SetText(hiddenText)
-		return
 	}
 }
 
@@ -54,9 +53,6 @@ func (scr *spur) Visualize(row int, column int) {
 		if column < len(values)+2 {
 			value = values[column-2]
 			scr.table.GetCell(row, column).SetText(value)
-			return
-		} else {
-			return
 		}
 	}
 }

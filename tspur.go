@@ -34,10 +34,6 @@ type spur struct {
 	form    *tview.Form  // form used for input/modification of records
 	table   *tview.Table // table with records
 	modes   *tview.Table // table to select mode
-	// to be deleted
-
-	lstFlx *tview.Flex
-	list   *tview.List
 
 	// screen underline data
 	keys         []string
@@ -47,7 +43,6 @@ type spur struct {
 	activeRow    int
 	activeColumn int
 	passwd       string
-	passwd2      string
 	cribName     string
 	mode         string
 	saveMenuInx  int
@@ -56,12 +51,10 @@ type spur struct {
 var scr spur
 
 // tspur is cheat sheet table.
-// Type of infromation could be any.
+// Type of infromation could be any, but I keep there my personal user names and passwords
 // Each row consists of key and one or more values
 
 func main() {
-	// Read cribsheet file and present it as the table
-	//data, _ := ioutil.ReadFile(CribName)
 	greeting := "tsupr.exe path_to_data_file"
 	var Usage = func() {
 		fmt.Fprintf(os.Stderr, greeting)
@@ -88,7 +81,6 @@ func main() {
 	})
 	scr.root = tview.NewPages()
 	scr.cribName = cmd[0]
-	//var sdata []string
 	_, errFile := os.Stat(scr.cribName)
 
 	scr.records = make(map[string][]string)
