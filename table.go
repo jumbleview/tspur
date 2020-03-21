@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
@@ -75,7 +76,9 @@ func (scr *spur) UpdateRecords(key string, values []string, visibility string) i
 			scr.width = len(v)
 		}
 	}
-	sort.Strings(scr.keys)
+	sort.Slice(scr.keys, func(i, j int) bool {
+		return strings.ToLower(scr.keys[i]) < strings.ToLower(scr.keys[j])
+	})
 	i := 0
 	k := ""
 	for i, k = range scr.keys {
