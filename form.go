@@ -30,7 +30,7 @@ func SetFormColors(form *tview.Form, background, field, font tcell.Color) {
 	form.SetLabelColor(font)
 }
 
-// MakeForm makes screen  Form to to insert/modify table record
+// MakeForm makes tspr  Form to to insert/modify table record
 func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 	scr.form = tview.NewForm()
 	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
@@ -102,15 +102,14 @@ func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 		submit("h")
 		scr.form.Clear(true)
 		scr.root.RemovePage(ModalName)
-		scr.table.SetSelectable(true, true)
-		app.SetFocus(scr.table)
+		scr.MoveFocusToTable(app)
 	})
+	scr.arrowBarrier = scr.form.GetButtonIndex("Save hidden")
 	scr.form.AddButton("Save visible", func() {
 		submit("v")
 		scr.form.Clear(true)
 		scr.root.RemovePage(ModalName)
-		scr.table.SetSelectable(true, true)
-		app.SetFocus(scr.table)
+		scr.MoveFocusToTable(app)
 	})
 
 	scr.form.AddButton("Cancel", cancel)
@@ -193,11 +192,11 @@ func (scr *spur) MakeModeTable(app *tview.Application) error {
 	scr.root = scr.root.AddPage(ModalName, modal, true, true)
 	app.SetRoot(scr.root, true)
 	app.SetFocus(modal)
-
+	scr.arrowBarrier = ArrowDefaultBarrier
 	return nil
 }
 
-// MakeNewPasswordForm makes screen  Form to change page password
+// MakeNewPasswordForm makes tspr  Form to change page password
 func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needOldPassword bool) error {
 	scr.form = tview.NewForm()
 	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
@@ -240,6 +239,7 @@ func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 		scr.form.Clear(true)
 		scr.root.RemovePage(ModalName)
 		app.SetFocus(scr.topMenu)
+		scr.arrowBarrier = 0
 	}
 	scr.form.AddButton("Submit", pwdSubmit)
 	scr.form.AddButton("Cancel", cancel)
@@ -257,7 +257,7 @@ func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 	return nil
 }
 
-// MakeEnterPasswordForm makes screen page with Form to enter page password
+// MakeEnterPasswordForm makes tspr page with Form to enter page password
 func (scr *spur) MakeEnterPasswordForm(app *tview.Application, title string) error {
 	scr.form = tview.NewForm()
 	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)

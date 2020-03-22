@@ -20,8 +20,9 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 	})
 	scr.topMenu.SetButtonBackgroundColor(tcell.ColorDarkBlue)
 	fselect := func() {
-		scr.table.SetSelectable(true, true)
-		app.SetFocus(scr.table)
+
+		scr.MoveFocusToTable(app)
+
 		row, col := scr.table.GetSelection()
 		if row < 1 || col < 1 {
 			row = 1
@@ -35,6 +36,7 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		} else if scr.mode == ModeClipSelect {
 			scr.ToClipBoard(row, col)
 		}
+		scr.arrowBarrier = -1
 	}
 	scr.topMenu.AddButton("Select", fselect)
 
@@ -93,8 +95,7 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 				scr.activeColumn = 1
 				scr.UpdateTable(app)
 				scr.root.RemovePage(ModalName)
-				scr.table.SetSelectable(true, true)
-				app.SetFocus(scr.table)
+				scr.MoveFocusToTable(app)
 				scr.topMenu.GetButton(scr.saveMenuInx).SetLabel("Save!")
 			} else {
 				scr.root.RemovePage(ModalName)

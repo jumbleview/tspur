@@ -25,9 +25,12 @@ const ModeVisibleEnter = "Visible-on-Enter"
 // ModeVisibleSelect means cell mode visual when selected
 const ModeVisibleSelect = "Visible-on-Select"
 
+// ArrowDefaultBarrier tells at which index to turn on Arrows key converting
+const ArrowDefaultBarrier = -1
+
 // spur contains all content of the tspur
 type spur struct {
-	// screens primitives
+	// tsprs primitives
 	root    *tview.Pages // container of pages used in app
 	flex    *tview.Flex  // container for the topMenu and the table
 	topMenu *tview.Form  // tp menu for the application
@@ -35,7 +38,7 @@ type spur struct {
 	table   *tview.Table // table with records
 	modes   *tview.Table // table to select mode
 
-	// screen underline data
+	// tspr underline data
 	keys         []string
 	records      map[string][]string
 	visibility   map[string]string
@@ -46,9 +49,8 @@ type spur struct {
 	cribName     string
 	mode         string
 	saveMenuInx  int
+	arrowBarrier int
 }
-
-var scr spur
 
 // tspur is cheat sheet table.
 // Type of infromation could be any, but I keep there my personal user names and passwords
@@ -67,50 +69,62 @@ func main() {
 		Usage()
 		os.Exit(1)
 	}
+	var tspr spur
+
 	tview.Styles.PrimitiveBackgroundColor = tcell.ColorDarkBlue
 	tview.Styles.PrimaryTextColor = tcell.ColorYellow
 	//tview.Styles.SecondaryTextColor = tcell.ColorWhite
 	//tview.Styles.TertiaryTextColor = tcell.ColorWhite
 	app := tview.NewApplication()
 
-	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyCtrlC {
-			clipboard.WriteAll(event.Name())
-		}
-		return event
-	})
-	scr.root = tview.NewPages()
-	scr.cribName = cmd[0]
-	_, errFile := os.Stat(scr.cribName)
+	// app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	// 	if event.Key() == tcell.KeyCtrlC {
+	// 		clipboard.WriteAll(event.Name())
+	// 	}
+	// 	return event
+	// })
+	tspr.root = tview.NewPages()
+	tspr.cribName = cmd[0]
+	_, errFile := os.Stat(tspr.cribName)
 
-	scr.records = make(map[string][]string)
-	scr.visibility = make(map[string]string)
-	scr.MakeTopMenu(app)
-	scr.MakeBaseTable(app)
-	scr.flex = tview.NewFlex()
-	scr.flex.SetDirection(tview.FlexRow)
+	tspr.records = make(map[string][]string)
+	tspr.visibility = make(map[string]string)
+	tspr.MakeTopMenu(app)
+	tspr.MakeBaseTable(app)
+	tspr.flex = tview.NewFlex()
+	tspr.flex.SetDirection(tview.FlexRow)
 	//scr.flex.SetDirection(tview.FlexColumn)
-	scr.flex.SetBorder(false)
-	scr.flex.AddItem(scr.topMenu, 0, 1, true)
-	scr.flex.AddItem(scr.table, 0, 12, false)
-	scr.root = scr.root.AddPage("table", scr.flex, true, true)
-	app.SetFocus(scr.flex)
+	tspr.flex.SetBorder(false)
+	tspr.flex.AddItem(tspr.topMenu, 0, 1, true)
+	tspr.flex.AddItem(tspr.table, 0, 12, false)
+	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)
+	app.SetFocus(tspr.flex)
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if !scr.table.HasFocus() && !scr.modes.HasFocus() {
-			if event.Key() == tcell.KeyRight || event.Key() == tcell.KeyDown {
+		if tspr.topMenu.HasFocus() || tspr.arrowBarrier > ArrowDefaultBarrier {
+			_, buttonI := tspr.form.GetFocusedItemIndex()
+			if tspr.topMenu.HasFocus() || buttonI >= tspr.arrowBarrier {
+				if event.Key() == tcell.KeyRight {
+					return tcell.NewEventKey(tcell.KeyTab, 0x09, 0)
+				}
+				if event.Key() == tcell.KeyLeft {
+					return tcell.NewEventKey(tcell.KeyBacktab, 0x09, 0)
+				}
+			}
+			if event.Key() == tcell.KeyDown {
 				return tcell.NewEventKey(tcell.KeyTab, 0x09, 0)
 			}
-			if event.Key() == tcell.KeyLeft || event.Key() == tcell.KeyUp {
+			if event.Key() == tcell.KeyUp {
 				return tcell.NewEventKey(tcell.KeyBacktab, 0x09, 0)
 			}
+
 		}
 		return event
 	})
 	if errFile == nil {
-		scr.MakeEnterPasswordForm(app, "Enter Password:")
+		tspr.MakeEnterPasswordForm(app, "Enter Password:")
 	} else {
 		needOldPassword := false
-		scr.MakeNewPasswordForm(app, "Create new Page", needOldPassword)
+		tspr.MakeNewPasswordForm(app, "Create new Page", needOldPassword)
 	}
 	if err := app.Run(); err != nil {
 		clipboard.WriteAll("")

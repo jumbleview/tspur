@@ -211,3 +211,9 @@ func (scr *spur) MakeBaseTable(app *tview.Application) {
 	})
 	scr.table.SetFixed(1, 1)
 }
+
+func (scr *spur) MoveFocusToTable(app *tview.Application) {
+	scr.table.SetSelectable(true, true)
+	app.SetFocus(scr.table)
+	scr.arrowBarrier = ArrowDefaultBarrier
+}
