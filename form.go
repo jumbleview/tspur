@@ -312,7 +312,7 @@ func (scr *spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 	pwdFlex.AddItem(scr.form, 0, 2, true)
 	pwdFlex.SetBackgroundColor(tcell.ColorDarkCyan)
 	pwdFlex.SetTitle(title)
-	pwdFlex.SetBorder(true) // In case of true border is on black background
+	pwdFlex.SetBorder(true)
 	modal := CompoundModal(pwdFlex, 27, 7)
 	scr.root = scr.root.AddPage(ModalName, modal, true, true)
 	app.SetRoot(scr.root, true)

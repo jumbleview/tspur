@@ -89,7 +89,7 @@ func main() {
 	tspr.flex.SetDirection(tview.FlexRow)
 	//scr.flex.SetDirection(tview.FlexColumn)
 	tspr.flex.SetBorder(false)
-	tspr.flex.AddItem(tspr.topMenu, 0, 1, true)
+	tspr.flex.AddItem(tspr.topMenu, 0, TopMenuProportion, true)
 	tspr.flex.AddItem(tspr.table, 0, 12, false)
 	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)
 	app.SetFocus(tspr.flex)
