@@ -77,12 +77,6 @@ func main() {
 	//tview.Styles.TertiaryTextColor = tcell.ColorWhite
 	app := tview.NewApplication()
 
-	// app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-	// 	if event.Key() == tcell.KeyCtrlC {
-	// 		clipboard.WriteAll(event.Name())
-	// 	}
-	// 	return event
-	// })
 	tspr.root = tview.NewPages()
 	tspr.cribName = cmd[0]
 	_, errFile := os.Stat(tspr.cribName)
@@ -117,6 +111,9 @@ func main() {
 				return tcell.NewEventKey(tcell.KeyBacktab, 0x09, 0)
 			}
 
+		}
+		if event.Key() == tcell.KeyCtrlC {
+			clipboard.WriteAll(event.Name())
 		}
 		return event
 	})
