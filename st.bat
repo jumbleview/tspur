@@ -1,3 +1,0 @@
-tspur.exe cribsheet
-pause
-

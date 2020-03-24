@@ -81,8 +81,6 @@ func main() {
 	tspr.cribName = cmd[0]
 	_, errFile := os.Stat(tspr.cribName)
 
-	tspr.records = make(map[string][]string)
-	tspr.visibility = make(map[string]string)
 	tspr.MakeTopMenu(app)
 	tspr.MakeBaseTable(app)
 	tspr.flex = tview.NewFlex()

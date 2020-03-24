@@ -2,7 +2,6 @@ package main
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
@@ -270,24 +269,7 @@ func (scr *spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 	pwdSubmit := func() {
 		data, err := DecryptFile(scr.cribName, passwd)
 		if err == nil {
-			scr.passwd = passwd
-			var sdata []string
-			if len(data) > 0 {
-				sdata = strings.Split(string(data), "\n")
-			}
-			for _, s := range sdata {
-				// parse string as csv
-				elems := strings.Split(s, ",")
-				if len(elems) > 1 {
-					values := elems[2:]
-					scr.keys = append(scr.keys, elems[1])
-					if len(values) > scr.width {
-						scr.width = len(values)
-					}
-					scr.records[elems[1]] = values
-					scr.visibility[elems[1]] = elems[0]
-				}
-			}
+			scr.AttachData(data, passwd)
 			scr.UpdateTable(app)
 			scr.form.Clear(true)
 			scr.root.RemovePage(ModalName)

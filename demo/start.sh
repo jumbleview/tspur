@@ -1,0 +1,4 @@
+#bash
+../tspur cribsheet
+
+

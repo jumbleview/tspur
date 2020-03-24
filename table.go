@@ -29,6 +29,31 @@ func (scr *spur) ToClipBoard(row int, column int) {
 	clipboard.WriteAll(value)
 }
 
+// AttachData initialize spur and attaches data to it
+func (scr *spur) AttachData(data []byte, pswd string) {
+	scr.passwd = pswd
+	var sdata []string
+	scr.records = make(map[string][]string)
+	scr.visibility = make(map[string]string)
+
+	if len(data) > 0 {
+		sdata = strings.Split(string(data), "\n")
+	}
+	for _, s := range sdata {
+		// parse string as csv
+		elems := strings.Split(s, ",")
+		if len(elems) > 1 {
+			values := elems[2:]
+			scr.keys = append(scr.keys, elems[1])
+			if len(values) > scr.width {
+				scr.width = len(values)
+			}
+			scr.records[elems[1]] = values
+			scr.visibility[elems[1]] = elems[0]
+		}
+	}
+}
+
 func (scr *spur) Hide(row int, column int) {
 	if row < 1 || column < 2 {
 		return // nothing ot do: hever hide key
