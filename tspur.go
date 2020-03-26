@@ -53,8 +53,8 @@ type spur struct {
 }
 
 // tspur is cheat sheet table.
-// Type of infromation could be any, but I keep there my personal user names and passwords
-// Each row consists of key and one or more values
+// Type of infromation could be any, but mostly user names and passwords
+// Each row consists of key and some values
 
 func main() {
 	greeting := "tsupr.exe path_to_data_file"
@@ -73,8 +73,6 @@ func main() {
 
 	tview.Styles.PrimitiveBackgroundColor = tcell.ColorDarkBlue
 	tview.Styles.PrimaryTextColor = tcell.ColorYellow
-	//tview.Styles.SecondaryTextColor = tcell.ColorWhite
-	//tview.Styles.TertiaryTextColor = tcell.ColorWhite
 	app := tview.NewApplication()
 
 	tspr.root = tview.NewPages()
@@ -85,10 +83,12 @@ func main() {
 	tspr.MakeBaseTable(app)
 	tspr.flex = tview.NewFlex()
 	tspr.flex.SetDirection(tview.FlexRow)
-	//scr.flex.SetDirection(tview.FlexColumn)
 	tspr.flex.SetBorder(false)
+	//topFlex := tview.NewFlex()
+	//topFlex.AddItem(tspr.topMenu, 0, TopMenuProportion, true)
+	//topFlex.SetBackgroundColor(tcell.ColorDarkBlue)
 	tspr.flex.AddItem(tspr.topMenu, 0, TopMenuProportion, true)
-	tspr.flex.AddItem(tspr.table, 0, 12, false)
+	tspr.flex.AddItem(tspr.table, 0, 7, false)
 	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)
 	app.SetFocus(tspr.flex)
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {

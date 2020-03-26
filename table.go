@@ -127,8 +127,12 @@ func (scr *spur) UpdateTable(app *tview.Application) error {
 	if width < 2 {
 		width = 2
 	}
-	for c := 0; c < width; c++ {
-		scr.table.SetCell(0, c+2, tview.NewTableCell(fmt.Sprintf("Field %d", c)).
+	wmax := width
+	if wmax < 3 {
+		wmax = 3
+	}
+	for c := 0; c < 3; c++ {
+		scr.table.SetCell(0, c+2, tview.NewTableCell(fmt.Sprintf("     Field %d     ", c)).
 			SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
 			SetSelectable(false))
 	}
@@ -176,7 +180,7 @@ func (scr *spur) MakeBaseTable(app *tview.Application) {
 		SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	for i := 0; i < 3; i++ {
-		scr.table.SetCell(0, i+2, tview.NewTableCell(fmt.Sprintf("Field %d", i)).
+		scr.table.SetCell(0, i+2, tview.NewTableCell(fmt.Sprintf("     Field %d     ", i)).
 			SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
 			SetSelectable(false))
 	}
