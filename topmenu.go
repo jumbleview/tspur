@@ -7,7 +7,7 @@ import (
 )
 
 // MakeTopMenu makes application top menu to navigate/manipulate table
-func (scr *spur) MakeTopMenu(app *tview.Application) error {
+func (scr *Spur) MakeTopMenu(app *tview.Application) error {
 	scr.topMenu = tview.NewForm()
 	scr.topMenu.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyRight || event.Key() == tcell.KeyDown {
@@ -18,7 +18,10 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 		}
 		return event
 	})
-	scr.topMenu.SetButtonBackgroundColor(tcell.ColorDarkBlue)
+
+	scr.topMenu.SetBackgroundColor(scr.MainBackgroundColor)
+	scr.topMenu.SetButtonBackgroundColor(scr.MainBackgroundColor)
+	scr.topMenu.SetButtonTextColor(scr.AccentColor)
 	fselect := func() {
 
 		scr.MoveFocusToTable(app)
@@ -70,10 +73,10 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 
 	scr.topMenu.AddButton("Delete", func() {
 		modal := tview.NewModal()
-		modal.SetBackgroundColor(tcell.ColorDarkCyan)
-		modal.SetButtonBackgroundColor(tcell.ColorDarkCyan)
-		modal.SetTextColor(tcell.ColorWhite)
-		modal.SetButtonTextColor(tcell.ColorWhite)
+		modal.SetBackgroundColor(scr.FormBackgroundColor)
+		modal.SetButtonBackgroundColor(scr.FormBackgroundColor)
+		modal.SetTextColor(scr.FormColor)
+		modal.SetButtonTextColor(scr.FormColor)
 		var key string
 		if scr.activeRow > 0 {
 			key = scr.keys[scr.activeRow-1]
@@ -111,10 +114,10 @@ func (scr *spur) MakeTopMenu(app *tview.Application) error {
 	scr.topMenu.AddButton("Save", func() {
 		//scr.MakeSaveForm(app, "")
 		modal := tview.NewModal()
-		modal.SetBackgroundColor(tcell.ColorDarkCyan)
-		modal.SetButtonBackgroundColor(tcell.ColorDarkCyan)
-		modal.SetTextColor(tcell.ColorWhite)
-		modal.SetButtonTextColor(tcell.ColorWhite)
+		modal.SetBackgroundColor(scr.FormBackgroundColor)
+		modal.SetButtonBackgroundColor(scr.FormBackgroundColor)
+		modal.SetTextColor(scr.FormColor)
+		modal.SetButtonTextColor(scr.FormColor)
 		modal.SetText("Save page?")
 		modal.AddButtons([]string{"Save", "Cancel"})
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {

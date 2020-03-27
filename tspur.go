@@ -28,8 +28,25 @@ const ModeVisibleSelect = "Visible-on-Select"
 // ArrowDefaultBarrier tells at which index to turn on Arrows key converting
 const ArrowDefaultBarrier = -1
 
+// ConsoleWidth is console horizontal dimension
+const ConsoleWidth = 80
+
+// ConsoleHeight is console vertical dimension
+const ConsoleHeight = 45
+
+// SpurTheme is color theme matched to tspur design
+type SpurTheme struct {
+	MainColor                tcell.Color // Font colors of the table
+	MainBackgroundColor      tcell.Color // Background color of te table and top menu
+	AccentColor              tcell.Color // Color of top menu font and table borders
+	TrackingColor            tcell.Color // Color to illuminate cell hit by ENter key
+	FormColor                tcell.Color // Form font and borders color
+	FormBackgroundColor      tcell.Color // Form background color
+	FormInputBackgroundColor tcell.Color // Form input field background
+}
+
 // spur contains all content of the tspur
-type spur struct {
+type Spur struct {
 	// tsprs primitives
 	root    *tview.Pages // container of pages used in app
 	flex    *tview.Flex  // container for the topMenu and the table
@@ -50,10 +67,16 @@ type spur struct {
 	mode         string
 	saveMenuInx  int
 	arrowBarrier int
+	// assigned color theme
+	SpurTheme
+}
+
+func (spr *Spur) AssignTheme(theme SpurTheme) {
+	spr.SpurTheme = theme
 }
 
 // tspur is cheat sheet table.
-// Type of infromation could be any, but mostly user names and passwords
+// Type of information could be any, but mostly user names and passwords
 // Each row consists of key and some values
 
 func main() {
@@ -69,10 +92,22 @@ func main() {
 		Usage()
 		os.Exit(1)
 	}
-	var tspr spur
+	var tspr Spur
 
-	tview.Styles.PrimitiveBackgroundColor = tcell.ColorDarkBlue
-	tview.Styles.PrimaryTextColor = tcell.ColorYellow
+	var GoldenBears = SpurTheme{
+		MainColor:                tcell.ColorWhite,
+		MainBackgroundColor:      tcell.ColorDarkBlue,
+		AccentColor:              tcell.ColorGold,
+		TrackingColor:            tcell.ColorRed,
+		FormColor:                tcell.ColorWhite,
+		FormBackgroundColor:      tcell.ColorDarkCyan,
+		FormInputBackgroundColor: tcell.ColorDarkBlue,
+	}
+
+	tspr.AssignTheme(GoldenBears)
+
+	SetDimension(ConsoleWidth, ConsoleHeight)
+
 	app := tview.NewApplication()
 
 	tspr.root = tview.NewPages()
@@ -84,9 +119,6 @@ func main() {
 	tspr.flex = tview.NewFlex()
 	tspr.flex.SetDirection(tview.FlexRow)
 	tspr.flex.SetBorder(false)
-	//topFlex := tview.NewFlex()
-	//topFlex.AddItem(tspr.topMenu, 0, TopMenuProportion, true)
-	//topFlex.SetBackgroundColor(tcell.ColorDarkBlue)
 	tspr.flex.AddItem(tspr.topMenu, 0, TopMenuProportion, true)
 	tspr.flex.AddItem(tspr.table, 0, 7, false)
 	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)

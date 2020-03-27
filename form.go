@@ -30,9 +30,9 @@ func SetFormColors(form *tview.Form, background, field, font tcell.Color) {
 }
 
 // MakeForm makes tspr  Form to to insert/modify table record
-func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
+func (scr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 	scr.form = tview.NewForm()
-	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
+	SetFormColors(scr.form, scr.FormBackgroundColor, scr.FormInputBackgroundColor, scr.FormColor)
 	scr.form.SetBorder(true)
 	count := scr.width
 	if count < 2 {
@@ -92,8 +92,6 @@ func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 	}
 	cancel := func() {
 		scr.form.Clear(true)
-		//cell := scr.table.GetCell(scr.table.GetSelection())
-		//clipboard.WriteAll(cell.Text)
 		scr.root.RemovePage(ModalName)
 		app.SetFocus(scr.topMenu)
 	}
@@ -118,7 +116,7 @@ func (scr *spur) MakeForm(app *tview.Application, vsbl string) error {
 	return nil
 }
 
-func (scr *spur) Save() {
+func (scr *Spur) Save() {
 	csv := ""
 	for _, key := range scr.keys {
 		line := scr.visibility[key]
@@ -141,24 +139,24 @@ func (scr *spur) Save() {
 }
 
 // MakeModeTable makes modal  table to choose Mode
-func (scr *spur) MakeModeTable(app *tview.Application) error {
+func (scr *Spur) MakeModeTable(app *tview.Application) error {
 	modesSet := [4]string{ModeClipEnter, ModeClipSelect, ModeVisibleEnter, ModeVisibleSelect}
 	scr.modes = tview.NewTable().SetBorders(false)
 
 	scr.modes.SetCell(0, 0, tview.NewTableCell(ModeClipEnter).
-		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(tcell.ColorDarkCyan).SetSelectable(true))
+		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
 
 	scr.modes.SetCell(1, 0, tview.NewTableCell(ModeClipSelect).
-		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(tcell.ColorDarkCyan).SetSelectable(true))
+		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
 
 	scr.modes.SetCell(2, 0, tview.NewTableCell(ModeVisibleEnter).
-		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(tcell.ColorDarkCyan).SetSelectable(true))
+		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
 	scr.modes.SetCell(3, 0, tview.NewTableCell(ModeVisibleSelect).
-		SetTextColor(tcell.ColorWhite).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(tcell.ColorDarkCyan).SetSelectable(true))
+		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
 
 	scr.modes.SetSelectedFunc(func(row, column int) {
 		scr.mode = modesSet[row]
@@ -184,7 +182,7 @@ func (scr *spur) MakeModeTable(app *tview.Application) error {
 	scr.modes.Select(i, 0)
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 	pwdFlex.AddItem(scr.modes, 0, 2, true)
-	pwdFlex.SetBackgroundColor(tcell.ColorDarkCyan)
+	pwdFlex.SetBackgroundColor(scr.FormBackgroundColor)
 	pwdFlex.SetTitle("Mode:")
 	pwdFlex.SetBorder(true)
 	modal := CompoundModal(pwdFlex, 21, 6)
@@ -196,9 +194,9 @@ func (scr *spur) MakeModeTable(app *tview.Application) error {
 }
 
 // MakeNewPasswordForm makes tspr  Form to change page password
-func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needOldPassword bool) error {
+func (scr *Spur) MakeNewPasswordForm(app *tview.Application, title string, needOldPassword bool) error {
 	scr.form = tview.NewForm()
-	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
+	SetFormColors(scr.form, scr.FormBackgroundColor, scr.FormInputBackgroundColor, scr.FormColor)
 	var oldPasswd, passwd1, passwd2 string
 	createInputs := func() {
 		if needOldPassword {
@@ -246,7 +244,7 @@ func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 	pwdFlex.AddItem(scr.form, 0, 2, true)
-	pwdFlex.SetBackgroundColor(tcell.ColorDarkCyan)
+	pwdFlex.SetBackgroundColor(scr.FormInputBackgroundColor)
 	pwdFlex.SetTitle(title)
 	pwdFlex.SetBorder(true) // In case of true border is on black background
 	modal := CompoundModal(pwdFlex, 40, 11)
@@ -257,9 +255,9 @@ func (scr *spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 }
 
 // MakeEnterPasswordForm makes tspr page with Form to enter page password
-func (scr *spur) MakeEnterPasswordForm(app *tview.Application, title string) error {
+func (scr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) error {
 	scr.form = tview.NewForm()
-	SetFormColors(scr.form, tcell.ColorDarkCyan, tcell.ColorDarkBlue, tcell.ColorWhite)
+	SetFormColors(scr.form, scr.FormBackgroundColor, scr.FormInputBackgroundColor, scr.FormColor)
 	var passwd string
 	createInputs := func() {
 		scr.form.AddPasswordField("", "", 21, '*', func(s string) {
@@ -292,7 +290,7 @@ func (scr *spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 	pwdFlex.AddItem(scr.form, 0, 2, true)
-	pwdFlex.SetBackgroundColor(tcell.ColorDarkCyan)
+	pwdFlex.SetBackgroundColor(scr.FormBackgroundColor)
 	pwdFlex.SetTitle(title)
 	pwdFlex.SetBorder(true)
 	modal := CompoundModal(pwdFlex, 27, 7)

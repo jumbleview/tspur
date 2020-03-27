@@ -12,7 +12,10 @@ import (
 
 const hiddenText = " **************** "
 
-func (scr *spur) ToClipBoard(row int, column int) {
+// TopMenuProportion is a proportional size of the Top Menu
+const TopMenuProportion = 1
+
+func (scr *Spur) ToClipBoard(row int, column int) {
 	if row < 1 || column < 1 {
 		return
 	}
@@ -30,7 +33,7 @@ func (scr *spur) ToClipBoard(row int, column int) {
 }
 
 // AttachData initialize spur and attaches data to it
-func (scr *spur) AttachData(data []byte, pswd string) {
+func (scr *Spur) AttachData(data []byte, pswd string) {
 	scr.passwd = pswd
 	var sdata []string
 	scr.records = make(map[string][]string)
@@ -54,7 +57,7 @@ func (scr *spur) AttachData(data []byte, pswd string) {
 	}
 }
 
-func (scr *spur) Hide(row int, column int) {
+func (scr *Spur) Hide(row int, column int) {
 	if row < 1 || column < 2 {
 		return // nothing ot do: hever hide key
 	}
@@ -68,7 +71,7 @@ func (scr *spur) Hide(row int, column int) {
 	}
 }
 
-func (scr *spur) Visualize(row int, column int) {
+func (scr *Spur) Visualize(row int, column int) {
 	if row < 1 || column < 1 {
 		return
 	}
@@ -84,7 +87,7 @@ func (scr *spur) Visualize(row int, column int) {
 }
 
 // UpdateRecords add or update element to the records or delete it if values=nil
-func (scr *spur) UpdateRecords(key string, values []string, visibility string) int {
+func (scr *Spur) UpdateRecords(key string, values []string, visibility string) int {
 	if values == nil { // delete element from the records
 		delete(scr.records, key)
 		delete(scr.visibility, key)
@@ -115,13 +118,13 @@ func (scr *spur) UpdateRecords(key string, values []string, visibility string) i
 }
 
 // UpdateTable brings table in accordance with records
-func (scr *spur) UpdateTable(app *tview.Application) error {
+func (scr *Spur) UpdateTable(app *tview.Application) error {
 	scr.table.Clear().SetBorders(true)
 	scr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("#%d", len(scr.records))).
-		SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
+		SetTextColor(scr.AccentColor).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	scr.table.SetCell(0, 1, tview.NewTableCell("Record Name").
-		SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
+		SetTextColor(scr.AccentColor).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	width := scr.width
 	if width < 2 {
@@ -133,16 +136,16 @@ func (scr *spur) UpdateTable(app *tview.Application) error {
 	}
 	for c := 0; c < 3; c++ {
 		scr.table.SetCell(0, c+2, tview.NewTableCell(fmt.Sprintf("     Field %d     ", c)).
-			SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
+			SetTextColor(scr.AccentColor).SetAlign(tview.AlignCenter).
 			SetSelectable(false))
 	}
 	for r := 0; r < len(scr.keys); r++ {
 		key := scr.keys[r]
 		scr.table.SetCell(r+1, 0, tview.NewTableCell(fmt.Sprintf("%d", r+1)).
-			SetTextColor(tcell.ColorWhite).
+			SetTextColor(scr.MainColor).
 			SetAlign(tview.AlignCenter).SetSelectable(false))
 		scr.table.SetCell(r+1, 1, tview.NewTableCell(key).
-			SetTextColor(tcell.ColorWhite).
+			SetTextColor(scr.MainColor).
 			SetAlign(tview.AlignCenter).SetSelectable(true))
 		values := scr.records[key]
 		for c := 0; c < width; c++ {
@@ -160,28 +163,29 @@ func (scr *spur) UpdateTable(app *tview.Application) error {
 				}
 			}
 			scr.table.SetCell(r+1, c+2, tview.NewTableCell(tblValue).
-				SetTextColor(tcell.ColorWhite).
+				SetTextColor(scr.MainColor).
 				SetAlign(tview.AlignCenter).SetSelectable(true))
 		}
 	}
 	return nil
 }
 
-// MakeBaseTable makes table to visualise at program start and assignes methods
-func (scr *spur) MakeBaseTable(app *tview.Application) {
+// MakeBaseTable makes table to visualize at program start and assigns methods
+func (scr *Spur) MakeBaseTable(app *tview.Application) {
 	scr.mode = ModeClipEnter
 	scr.modes = tview.NewTable().SetBorders(false)
 	scr.table = tview.NewTable().SetBorders(true)
-	scr.table.SetBordersColor(tcell.ColorYellow)
+	scr.table.SetBackgroundColor(scr.MainBackgroundColor)
+	scr.table.SetBordersColor(scr.AccentColor)
 	// Making table title
 	scr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("#24")).
-		SetTextColor(tcell.ColorYellow).SetSelectable(false))
+		SetTextColor(scr.AccentColor).SetSelectable(false))
 	scr.table.SetCell(0, 1, tview.NewTableCell("Record Name").
-		SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
+		SetTextColor(scr.AccentColor).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	for i := 0; i < 3; i++ {
 		scr.table.SetCell(0, i+2, tview.NewTableCell(fmt.Sprintf("     Field %d     ", i)).
-			SetTextColor(tcell.ColorYellow).SetAlign(tview.AlignCenter).
+			SetTextColor(scr.AccentColor).SetAlign(tview.AlignCenter).
 			SetSelectable(false))
 	}
 	// Making table body
@@ -189,17 +193,17 @@ func (scr *spur) MakeBaseTable(app *tview.Application) {
 	const width = 3
 	for r := 0; r < hight; r++ {
 		scr.table.SetCell(r+1, 0, tview.NewTableCell(fmt.Sprintf("%d", r+1)).
-			SetTextColor(tcell.ColorWhite).
+			SetTextColor(scr.MainColor).
 			SetAlign(tview.AlignCenter).SetSelectable(false))
 		for j := 1; j <= width; j++ {
 			scr.table.SetCell(r+1, j, tview.NewTableCell(hiddenText).
-				SetTextColor(tcell.ColorWhite).
+				SetTextColor(scr.MainColor).
 				SetAlign(tview.AlignCenter).SetSelectable(true))
 		}
 	}
 	scr.table.SetSelectedFunc(func(row int, column int) {
 		cell := scr.table.GetCell(row, column)
-		cell.SetTextColor(tcell.ColorRed)
+		cell.SetTextColor(scr.TrackingColor)
 		if len(scr.records) <= 0 {
 			return
 		}
@@ -241,7 +245,7 @@ func (scr *spur) MakeBaseTable(app *tview.Application) {
 	scr.table.SetFixed(1, 1)
 }
 
-func (scr *spur) MoveFocusToTable(app *tview.Application) {
+func (scr *Spur) MoveFocusToTable(app *tview.Application) {
 	scr.table.SetSelectable(true, true)
 	app.SetFocus(scr.table)
 	scr.arrowBarrier = ArrowDefaultBarrier

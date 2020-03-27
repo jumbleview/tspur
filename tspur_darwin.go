@@ -2,5 +2,7 @@
 
 package main
 
-// TopMenuProportion is a proportional size of the Top Menu
-const TopMenuProportion = 2
+// SetDimension sets size of console
+func SetDimension(cols int, lines int) {
+	// Nothing to do so far
+}
