@@ -30,24 +30,24 @@ func SetFormColors(form *tview.Form, background, field, font tcell.Color) {
 }
 
 // MakeForm makes tspr  Form to to insert/modify table record
-func (scr *Spur) MakeForm(app *tview.Application, vsbl string) error {
-	scr.form = tview.NewForm()
-	SetFormColors(scr.form, scr.FormBackgroundColor, scr.FormInputBackgroundColor, scr.FormColor)
-	scr.form.SetBorder(true)
-	count := scr.width
+func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
+	spr.form = tview.NewForm()
+	SetFormColors(spr.form, spr.FormBackgroundColor, spr.FormInputBackgroundColor, spr.FormColor)
+	spr.form.SetBorder(true)
+	count := spr.width
 	if count < 2 {
 		count = 2
 	}
 	var k string
 	var v []string
-	if scr.activeRow > 0 {
-		k = scr.keys[scr.activeRow-1]
+	if spr.activeRow > 0 {
+		k = spr.keys[spr.activeRow-1]
 	}
-	scr.form.AddInputField("Record Name", k, 21, nil, func(inp string) {
+	spr.form.AddInputField("Record Name", k, 21, nil, func(inp string) {
 		k = inp
 	})
 	if len(k) > 0 {
-		v = append(v, scr.records[k]...)
+		v = append(v, spr.records[k]...)
 	}
 	for i := 0; i <= count; i++ {
 		valName := "Field " + strconv.Itoa(i)
@@ -67,16 +67,16 @@ func (scr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 			clipboard.WriteAll(inp)
 		}
 		if vsbl == "h" {
-			scr.form.AddPasswordField(valName, v[i], 21, '*', changed)
+			spr.form.AddPasswordField(valName, v[i], 21, '*', changed)
 		} else {
-			scr.form.AddInputField(valName, v[i], 21, accepted, changed)
+			spr.form.AddInputField(valName, v[i], 21, accepted, changed)
 		}
 	}
 	submit := func(presentation string) {
 		if len(k) > 0 {
-			_, ok := scr.records[k]
+			_, ok := spr.records[k]
 			if !ok {
-				scr.keys = append(scr.keys, k)
+				spr.keys = append(spr.keys, k)
 			}
 			for j := len(v) - 1; j >= 0; j-- {
 				if len(v[j]) > 0 {
@@ -84,45 +84,45 @@ func (scr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 				}
 				v = v[:j]
 			}
-			keyPlace := scr.UpdateRecords(k, v, presentation)
-			scr.UpdateTable(app)
-			scr.table.Select(keyPlace+1, 1)
-			scr.topMenu.GetButton(scr.saveMenuInx).SetLabel("Save!")
+			keyPlace := spr.UpdateRecords(k, v, presentation)
+			spr.UpdateTable(app)
+			spr.table.Select(keyPlace+1, 1)
+			spr.topMenu.GetButton(spr.saveMenuInx).SetLabel("Save!")
 		}
 	}
 	cancel := func() {
-		scr.form.Clear(true)
-		scr.root.RemovePage(ModalName)
-		app.SetFocus(scr.topMenu)
+		spr.form.Clear(true)
+		spr.root.RemovePage(ModalName)
+		app.SetFocus(spr.topMenu)
 	}
-	scr.form.AddButton("Save hidden", func() {
+	spr.form.AddButton("Save hidden", func() {
 		submit("h")
-		scr.form.Clear(true)
-		scr.root.RemovePage(ModalName)
-		scr.MoveFocusToTable(app)
+		spr.form.Clear(true)
+		spr.root.RemovePage(ModalName)
+		spr.MoveFocusToTable(app)
 	})
-	scr.arrowBarrier = scr.form.GetButtonIndex("Save hidden")
-	scr.form.AddButton("Save visible", func() {
+	spr.arrowBarrier = spr.form.GetButtonIndex("Save hidden")
+	spr.form.AddButton("Save visible", func() {
 		submit("v")
-		scr.form.Clear(true)
-		scr.root.RemovePage(ModalName)
-		scr.MoveFocusToTable(app)
+		spr.form.Clear(true)
+		spr.root.RemovePage(ModalName)
+		spr.MoveFocusToTable(app)
 	})
 
-	scr.form.AddButton("Cancel", cancel)
+	spr.form.AddButton("Cancel", cancel)
 
-	scr.form.SetCancelFunc(cancel)
+	spr.form.SetCancelFunc(cancel)
 
 	return nil
 }
 
-func (scr *Spur) Save() {
+func (spr *Spur) Save() {
 	csv := ""
-	for _, key := range scr.keys {
-		line := scr.visibility[key]
+	for _, key := range spr.keys {
+		line := spr.visibility[key]
 		line += ","
 		line += key
-		values := scr.records[key]
+		values := spr.records[key]
 		for _, value := range values {
 			line += ","
 			line += value
@@ -131,7 +131,7 @@ func (scr *Spur) Save() {
 		csv += line
 	}
 	//if len(csv) > 0 {
-	err := EncryptFile(scr.cribName, []byte(csv), scr.passwd)
+	err := EncryptFile(spr.cribName, []byte(csv), spr.passwd)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -139,144 +139,144 @@ func (scr *Spur) Save() {
 }
 
 // MakeModeTable makes modal  table to choose Mode
-func (scr *Spur) MakeModeTable(app *tview.Application) error {
+func (spr *Spur) MakeModeTable(app *tview.Application) error {
 	modesSet := [4]string{ModeClipEnter, ModeClipSelect, ModeVisibleEnter, ModeVisibleSelect}
-	scr.modes = tview.NewTable().SetBorders(false)
+	spr.modes = tview.NewTable().SetBorders(false)
 
-	scr.modes.SetCell(0, 0, tview.NewTableCell(ModeClipEnter).
-		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
+	spr.modes.SetCell(0, 0, tview.NewTableCell(ModeClipEnter).
+		SetTextColor(spr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(spr.FormBackgroundColor).SetSelectable(true))
 
-	scr.modes.SetCell(1, 0, tview.NewTableCell(ModeClipSelect).
-		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
+	spr.modes.SetCell(1, 0, tview.NewTableCell(ModeClipSelect).
+		SetTextColor(spr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(spr.FormBackgroundColor).SetSelectable(true))
 
-	scr.modes.SetCell(2, 0, tview.NewTableCell(ModeVisibleEnter).
-		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
-	scr.modes.SetCell(3, 0, tview.NewTableCell(ModeVisibleSelect).
-		SetTextColor(scr.FormColor).SetAlign(tview.AlignCenter).
-		SetBackgroundColor(scr.FormBackgroundColor).SetSelectable(true))
+	spr.modes.SetCell(2, 0, tview.NewTableCell(ModeVisibleEnter).
+		SetTextColor(spr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(spr.FormBackgroundColor).SetSelectable(true))
+	spr.modes.SetCell(3, 0, tview.NewTableCell(ModeVisibleSelect).
+		SetTextColor(spr.FormColor).SetAlign(tview.AlignCenter).
+		SetBackgroundColor(spr.FormBackgroundColor).SetSelectable(true))
 
-	scr.modes.SetSelectedFunc(func(row, column int) {
-		scr.mode = modesSet[row]
-		scr.modes.Clear()
-		scr.root.RemovePage(ModalName)
-		app.SetFocus(scr.topMenu)
+	spr.modes.SetSelectedFunc(func(row, column int) {
+		spr.mode = modesSet[row]
+		spr.modes.Clear()
+		spr.root.RemovePage(ModalName)
+		app.SetFocus(spr.topMenu)
 	})
-	scr.modes.SetDoneFunc(func(key tcell.Key) {
+	spr.modes.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
 		} else if key == tcell.KeyEscape {
-			scr.modes.Clear()
-			scr.root.RemovePage(ModalName)
-			app.SetFocus(scr.topMenu)
+			spr.modes.Clear()
+			spr.root.RemovePage(ModalName)
+			app.SetFocus(spr.topMenu)
 		}
 	})
-	scr.modes.SetSelectable(true, true)
+	spr.modes.SetSelectable(true, true)
 	var i int
 	for i = range modesSet {
-		if scr.mode == modesSet[i] {
+		if spr.mode == modesSet[i] {
 			break
 		}
 	}
-	scr.modes.Select(i, 0)
+	spr.modes.Select(i, 0)
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
-	pwdFlex.AddItem(scr.modes, 0, 2, true)
-	pwdFlex.SetBackgroundColor(scr.FormBackgroundColor)
+	pwdFlex.AddItem(spr.modes, 0, 2, true)
+	pwdFlex.SetBackgroundColor(spr.FormBackgroundColor)
 	pwdFlex.SetTitle("Mode:")
 	pwdFlex.SetBorder(true)
 	modal := CompoundModal(pwdFlex, 21, 6)
-	scr.root = scr.root.AddPage(ModalName, modal, true, true)
-	app.SetRoot(scr.root, true)
+	spr.root = spr.root.AddPage(ModalName, modal, true, true)
+	app.SetRoot(spr.root, true)
 	app.SetFocus(modal)
-	scr.arrowBarrier = ArrowDefaultBarrier
+	spr.arrowBarrier = ArrowDefaultBarrier
 	return nil
 }
 
 // MakeNewPasswordForm makes tspr  Form to change page password
-func (scr *Spur) MakeNewPasswordForm(app *tview.Application, title string, needOldPassword bool) error {
-	scr.form = tview.NewForm()
-	SetFormColors(scr.form, scr.FormBackgroundColor, scr.FormInputBackgroundColor, scr.FormColor)
+func (spr *Spur) MakeNewPasswordForm(app *tview.Application, title string, needOldPassword bool) error {
+	spr.form = tview.NewForm()
+	SetFormColors(spr.form, spr.FormBackgroundColor, spr.FormInputBackgroundColor, spr.FormColor)
 	var oldPasswd, passwd1, passwd2 string
 	createInputs := func() {
 		if needOldPassword {
-			scr.form.AddPasswordField("Old Password:", "", 21, '*', func(s string) {
+			spr.form.AddPasswordField("Old Password:", "", 21, '*', func(s string) {
 				oldPasswd = s
 			})
 		}
-		scr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
+		spr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
 			passwd1 = s
 		})
-		scr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
+		spr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
 			passwd2 = s
 		})
 	}
 	pwdSubmit := func() {
-		if oldPasswd == scr.passwd && passwd1 == passwd2 {
-			scr.passwd = passwd1
-			scr.Save()
-			scr.form.Clear(true)
+		if oldPasswd == spr.passwd && passwd1 == passwd2 {
+			spr.passwd = passwd1
+			spr.Save()
+			spr.form.Clear(true)
 			if !needOldPassword { // this is case of creating new page
-				scr.UpdateTable(app)
+				spr.UpdateTable(app)
 			}
-			scr.root.RemovePage(ModalName)
-			app.SetFocus(scr.topMenu)
+			spr.root.RemovePage(ModalName)
+			app.SetFocus(spr.topMenu)
 		} else {
-			scr.form.Clear(true)
-			scr.root.RemovePage(ModalName)
+			spr.form.Clear(true)
+			spr.root.RemovePage(ModalName)
 			title := " New passwords do not math. Repeat "
-			if oldPasswd != scr.passwd {
+			if oldPasswd != spr.passwd {
 				title = " Wrong old password. Repeat "
 			}
-			scr.MakeNewPasswordForm(app, title, needOldPassword)
+			spr.MakeNewPasswordForm(app, title, needOldPassword)
 		}
 	}
 	createInputs()
 	cancel := func() {
-		scr.form.Clear(true)
-		scr.root.RemovePage(ModalName)
-		app.SetFocus(scr.topMenu)
-		scr.arrowBarrier = 0
+		spr.form.Clear(true)
+		spr.root.RemovePage(ModalName)
+		app.SetFocus(spr.topMenu)
+		spr.arrowBarrier = 0
 	}
-	scr.form.AddButton("Submit", pwdSubmit)
-	scr.form.AddButton("Cancel", cancel)
-	scr.form.SetCancelFunc(cancel)
+	spr.form.AddButton("Submit", pwdSubmit)
+	spr.form.AddButton("Cancel", cancel)
+	spr.form.SetCancelFunc(cancel)
 
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
-	pwdFlex.AddItem(scr.form, 0, 2, true)
-	pwdFlex.SetBackgroundColor(scr.FormInputBackgroundColor)
+	pwdFlex.AddItem(spr.form, 0, 2, true)
+	pwdFlex.SetBackgroundColor(spr.FormInputBackgroundColor)
 	pwdFlex.SetTitle(title)
 	pwdFlex.SetBorder(true) // In case of true border is on black background
 	modal := CompoundModal(pwdFlex, 40, 11)
-	scr.root = scr.root.AddPage(ModalName, modal, true, true)
-	app.SetRoot(scr.root, true)
+	spr.root = spr.root.AddPage(ModalName, modal, true, true)
+	app.SetRoot(spr.root, true)
 	app.SetFocus(modal)
 	return nil
 }
 
 // MakeEnterPasswordForm makes tspr page with Form to enter page password
-func (scr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) error {
-	scr.form = tview.NewForm()
-	SetFormColors(scr.form, scr.FormBackgroundColor, scr.FormInputBackgroundColor, scr.FormColor)
+func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) error {
+	spr.form = tview.NewForm()
+	SetFormColors(spr.form, spr.FormBackgroundColor, spr.FormInputBackgroundColor, spr.FormColor)
 	var passwd string
 	createInputs := func() {
-		scr.form.AddPasswordField("", "", 21, '*', func(s string) {
+		spr.form.AddPasswordField("", "", 21, '*', func(s string) {
 			passwd = s
 		})
 	}
 	pwdSubmit := func() {
-		data, err := DecryptFile(scr.cribName, passwd)
+		data, err := DecryptFile(spr.cribName, passwd)
 		if err == nil {
-			scr.AttachData(data, passwd)
-			scr.UpdateTable(app)
-			scr.form.Clear(true)
-			scr.root.RemovePage(ModalName)
-			app.SetFocus(scr.topMenu)
+			spr.AttachData(data, passwd)
+			spr.UpdateTable(app)
+			spr.form.Clear(true)
+			spr.root.RemovePage(ModalName)
+			app.SetFocus(spr.topMenu)
 		} else {
-			scr.form.Clear(true)
-			scr.root.RemovePage(ModalName)
+			spr.form.Clear(true)
+			spr.root.RemovePage(ModalName)
 			title = " Wrong password. Repeat "
-			scr.MakeEnterPasswordForm(app, title)
+			spr.MakeEnterPasswordForm(app, title)
 		}
 	}
 	createInputs()
@@ -284,18 +284,18 @@ func (scr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 		app.Stop()
 		return
 	}
-	scr.form.AddButton("Submit", pwdSubmit)
-	scr.form.AddButton("Cancel", cancel)
-	scr.form.SetCancelFunc(cancel)
+	spr.form.AddButton("Submit", pwdSubmit)
+	spr.form.AddButton("Cancel", cancel)
+	spr.form.SetCancelFunc(cancel)
 
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
-	pwdFlex.AddItem(scr.form, 0, 2, true)
-	pwdFlex.SetBackgroundColor(scr.FormBackgroundColor)
+	pwdFlex.AddItem(spr.form, 0, 2, true)
+	pwdFlex.SetBackgroundColor(spr.FormBackgroundColor)
 	pwdFlex.SetTitle(title)
 	pwdFlex.SetBorder(true)
 	modal := CompoundModal(pwdFlex, 27, 7)
-	scr.root = scr.root.AddPage(ModalName, modal, true, true)
-	app.SetRoot(scr.root, true)
+	spr.root = spr.root.AddPage(ModalName, modal, true, true)
+	app.SetRoot(spr.root, true)
 	app.SetFocus(modal)
 	return nil
 }

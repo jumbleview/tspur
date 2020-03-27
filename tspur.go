@@ -34,6 +34,10 @@ const ConsoleWidth = 80
 // ConsoleHeight is console vertical dimension
 const ConsoleHeight = 45
 
+// TopMenuProportion and Table proportional size
+const TopMenuProportion = 1
+const TableProportion = 7
+
 // SpurTheme is color theme matched to tspur design
 type SpurTheme struct {
 	MainColor                tcell.Color // Font colors of the table
@@ -120,7 +124,7 @@ func main() {
 	tspr.flex.SetDirection(tview.FlexRow)
 	tspr.flex.SetBorder(false)
 	tspr.flex.AddItem(tspr.topMenu, 0, TopMenuProportion, true)
-	tspr.flex.AddItem(tspr.table, 0, 7, false)
+	tspr.flex.AddItem(tspr.table, 0, TableProportion, false)
 	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)
 	app.SetFocus(tspr.flex)
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {

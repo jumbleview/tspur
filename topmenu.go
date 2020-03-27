@@ -7,9 +7,9 @@ import (
 )
 
 // MakeTopMenu makes application top menu to navigate/manipulate table
-func (scr *Spur) MakeTopMenu(app *tview.Application) error {
-	scr.topMenu = tview.NewForm()
-	scr.topMenu.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+func (spr *Spur) MakeTopMenu(app *tview.Application) error {
+	spr.topMenu = tview.NewForm()
+	spr.topMenu.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyRight || event.Key() == tcell.KeyDown {
 			return tcell.NewEventKey(tcell.KeyTab, 0x09, 0)
 		}
@@ -19,67 +19,67 @@ func (scr *Spur) MakeTopMenu(app *tview.Application) error {
 		return event
 	})
 
-	scr.topMenu.SetBackgroundColor(scr.MainBackgroundColor)
-	scr.topMenu.SetButtonBackgroundColor(scr.MainBackgroundColor)
-	scr.topMenu.SetButtonTextColor(scr.AccentColor)
+	spr.topMenu.SetBackgroundColor(spr.MainBackgroundColor)
+	spr.topMenu.SetButtonBackgroundColor(spr.MainBackgroundColor)
+	spr.topMenu.SetButtonTextColor(spr.AccentColor)
 	fselect := func() {
 
-		scr.MoveFocusToTable(app)
+		spr.MoveFocusToTable(app)
 
-		row, col := scr.table.GetSelection()
+		row, col := spr.table.GetSelection()
 		if row < 1 || col < 1 {
 			row = 1
 			col = 1
 		}
-		//cell := scr.table.GetCell(row, col)
-		scr.activeRow = row
-		scr.activeColumn = col
-		if scr.mode == ModeVisibleSelect {
-			scr.Visualize(row, col)
-		} else if scr.mode == ModeClipSelect {
-			scr.ToClipBoard(row, col)
+		//cell := spr.table.GetCell(row, col)
+		spr.activeRow = row
+		spr.activeColumn = col
+		if spr.mode == ModeVisibleSelect {
+			spr.Visualize(row, col)
+		} else if spr.mode == ModeClipSelect {
+			spr.ToClipBoard(row, col)
 		}
-		scr.arrowBarrier = -1
+		spr.arrowBarrier = -1
 	}
-	scr.topMenu.AddButton("Select", fselect)
+	spr.topMenu.AddButton("Select", fselect)
 
-	scr.topMenu.AddButton("Mode", func() {
-		scr.MakeModeTable(app)
+	spr.topMenu.AddButton("Mode", func() {
+		spr.MakeModeTable(app)
 	})
 
 	addHidden := func() {
-		scr.activeRow = -1
-		scr.MakeForm(app, "h")
-		modal := CompoundModal(scr.form, 45, 15)
-		scr.root = scr.root.AddPage(ModalName, modal, true, true)
-		app.SetRoot(scr.root, true)
+		spr.activeRow = -1
+		spr.MakeForm(app, "h")
+		modal := CompoundModal(spr.form, 45, 15)
+		spr.root = spr.root.AddPage(ModalName, modal, true, true)
+		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
 	}
 
-	scr.topMenu.AddButton("Add", addHidden)
+	spr.topMenu.AddButton("Add", addHidden)
 
-	scr.topMenu.AddButton("Edit", func() {
+	spr.topMenu.AddButton("Edit", func() {
 		visibility := "v"
-		if scr.activeRow > 0 {
-			visibility = scr.visibility[scr.keys[scr.activeRow-1]]
+		if spr.activeRow > 0 {
+			visibility = spr.visibility[spr.keys[spr.activeRow-1]]
 		}
-		scr.MakeForm(app, visibility)
-		modal := CompoundModal(scr.form, 45, 15)
-		scr.root = scr.root.AddPage(ModalName, modal, true, true)
-		app.SetRoot(scr.root, true)
+		spr.MakeForm(app, visibility)
+		modal := CompoundModal(spr.form, 45, 15)
+		spr.root = spr.root.AddPage(ModalName, modal, true, true)
+		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
 
 	})
 
-	scr.topMenu.AddButton("Delete", func() {
+	spr.topMenu.AddButton("Delete", func() {
 		modal := tview.NewModal()
-		modal.SetBackgroundColor(scr.FormBackgroundColor)
-		modal.SetButtonBackgroundColor(scr.FormBackgroundColor)
-		modal.SetTextColor(scr.FormColor)
-		modal.SetButtonTextColor(scr.FormColor)
+		modal.SetBackgroundColor(spr.FormBackgroundColor)
+		modal.SetButtonBackgroundColor(spr.FormBackgroundColor)
+		modal.SetTextColor(spr.FormColor)
+		modal.SetButtonTextColor(spr.FormColor)
 		var key string
-		if scr.activeRow > 0 {
-			key = scr.keys[scr.activeRow-1]
+		if spr.activeRow > 0 {
+			key = spr.keys[spr.activeRow-1]
 		}
 		if len(key) > 0 {
 			modal.SetText("Delete record:" + key + "?")
@@ -90,53 +90,53 @@ func (scr *Spur) MakeTopMenu(app *tview.Application) error {
 		}
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Delete" {
-				scr.UpdateRecords(key, nil, "")
-				scr.activeRow--
-				if scr.activeRow <= 0 {
-					scr.activeRow = 1
+				spr.UpdateRecords(key, nil, "")
+				spr.activeRow--
+				if spr.activeRow <= 0 {
+					spr.activeRow = 1
 				}
-				scr.activeColumn = 1
-				scr.UpdateTable(app)
-				scr.root.RemovePage(ModalName)
-				scr.MoveFocusToTable(app)
-				scr.topMenu.GetButton(scr.saveMenuInx).SetLabel("Save!")
+				spr.activeColumn = 1
+				spr.UpdateTable(app)
+				spr.root.RemovePage(ModalName)
+				spr.MoveFocusToTable(app)
+				spr.topMenu.GetButton(spr.saveMenuInx).SetLabel("Save!")
 			} else {
-				scr.root.RemovePage(ModalName)
-				app.SetFocus(scr.topMenu)
+				spr.root.RemovePage(ModalName)
+				app.SetFocus(spr.topMenu)
 			}
 		})
 		modalo := CompoundModal(modal, 15, 5)
-		scr.root = scr.root.AddPage(ModalName, modalo, true, true)
-		app.SetRoot(scr.root, true)
+		spr.root = spr.root.AddPage(ModalName, modalo, true, true)
+		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
 	})
 
-	scr.topMenu.AddButton("Save", func() {
-		//scr.MakeSaveForm(app, "")
+	spr.topMenu.AddButton("Save", func() {
+		//spr.MakeSaveForm(app, "")
 		modal := tview.NewModal()
-		modal.SetBackgroundColor(scr.FormBackgroundColor)
-		modal.SetButtonBackgroundColor(scr.FormBackgroundColor)
-		modal.SetTextColor(scr.FormColor)
-		modal.SetButtonTextColor(scr.FormColor)
+		modal.SetBackgroundColor(spr.FormBackgroundColor)
+		modal.SetButtonBackgroundColor(spr.FormBackgroundColor)
+		modal.SetTextColor(spr.FormColor)
+		modal.SetButtonTextColor(spr.FormColor)
 		modal.SetText("Save page?")
 		modal.AddButtons([]string{"Save", "Cancel"})
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Save" {
-				scr.Save()
-				scr.topMenu.GetButton(scr.saveMenuInx).SetLabel("Save")
+				spr.Save()
+				spr.topMenu.GetButton(spr.saveMenuInx).SetLabel("Save")
 			}
-			scr.root.RemovePage(ModalName)
-			app.SetFocus(scr.topMenu)
+			spr.root.RemovePage(ModalName)
+			app.SetFocus(spr.topMenu)
 		})
 		modalo := CompoundModal(modal, 15, 5)
-		scr.root = scr.root.AddPage(ModalName, modalo, true, true)
-		app.SetRoot(scr.root, true)
+		spr.root = spr.root.AddPage(ModalName, modalo, true, true)
+		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
 	})
 
-	scr.topMenu.AddButton("Password", func() {
+	spr.topMenu.AddButton("Password", func() {
 		needOldPassword := true
-		scr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)
+		spr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)
 	})
 
 	fexit := func() {
@@ -144,7 +144,7 @@ func (scr *Spur) MakeTopMenu(app *tview.Application) error {
 		app.Stop()
 	}
 
-	scr.topMenu.AddButton("Exit", fexit)
-	scr.saveMenuInx = scr.topMenu.GetButtonIndex("Save")
+	spr.topMenu.AddButton("Exit", fexit)
+	spr.saveMenuInx = spr.topMenu.GetButtonIndex("Save")
 	return nil
 }
