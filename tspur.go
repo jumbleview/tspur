@@ -75,10 +75,6 @@ type Spur struct {
 	SpurTheme
 }
 
-func (spr *Spur) AssignTheme(theme SpurTheme) {
-	spr.SpurTheme = theme
-}
-
 // tspur is cheat sheet table.
 // Type of information could be any, but mostly user names and passwords
 // Each row consists of key and some values
@@ -108,9 +104,7 @@ func main() {
 		FormInputBackgroundColor: tcell.ColorDarkBlue,
 	}
 
-	tspr.AssignTheme(GoldenBears)
-
-	SetDimension(ConsoleWidth, ConsoleHeight)
+	tspr.SpurTheme = GoldenBears
 
 	app := tview.NewApplication()
 

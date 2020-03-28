@@ -1,18 +1,23 @@
 # tspur
 
-Terminal Screen with Protected User Records (TSPUR) is the utility which may serve as terminal cheat sheet or password manager.  
+Terminal Screen with Protected User Records (TSPUR) is the terminal application  with some user records presented as a table. It could be used as cheat sheet (for example to keep some usernames and passwords  together).
 
 ![TSPUR](./images/tspur.png)
 
-It is TUI application. The screen consists of two areas:
+## General Description
+
+Application terminal consists of two areas:
+
 * Top menu
 * Table with User Records
 
-To start the application supply it with single argument: path to file with data storage. Storage is encoded and password protected. If such a storage does not exists yet application will ask you to enter the password and  will create a new storage.
+Application starts with single argument: path to file with data storage. Storage is encoded and password protected. If such a storage does not exists application will ask you to enter the new password and  will create a new storage.
 
-Application starts with focus on the top menu. Hitting "Enter" while button "Select" is in focus put the focus on the table. To navigate through the table use arrow keys. To put focus  back on top menu use "Esc".
+At start application puts focus on the top menu. Hitting "Enter" while button "Select" is in focus move the focus to the table. To navigate through the table use arrow keys. To put focus  back on the top menu use "Esc".
 
-Number of table rows and columns is unlimited but it is unlikely somebody will use more then hundred rows or 3..5 columns. Rows contains one key cell (Record Name), which is always visible and several values which maybe visible or hidden.
+Number of table rows and columns is unlimited but it is unlikely somebody will use more then hundred rows or more then 3..5 columns. Each rows contains one cell (Record Name), which is always visible, and several values. Values on each row may be either all visible or all hidden.
+
+## Application Modes
 
 Application supports four modes:
 
@@ -26,35 +31,42 @@ Application supports four modes:
 
 * Visible-on-Select. If user selects cell with hidden content it becomes visible. When cell becomes unselected its contents becomes hidden again. 
 
-![TSPUR_SELECT](./images/tspur_select.png)
+## Entering the Data
 
-User may add new cells or edit existing. Row maybe extended with one more value. If there is need to add several values process may be repeated several times.
+User may add new records (button "Add") or edit existing (button "Edit"). To start edit existing record select it first, then by "Esc" gp to the top menu. Record maybe extended with one more value. If there is need to add several values repeat the process several times.
 
 ![TSPUR_EDIT](./images/tspur_edit.png)
 
-# Dependency
+## Dependency
 
-Application written in Go language and compiled to standalone executable. All the heavy lifting is done by three imported packages:
+It is pure go application (no cgo needed). All the heavy lifting is done by  imported packages:
 
 	"github.com/rivo/tview"
 	"github.com/gdamore/tcell"
 	"github.com/atotto/clipboard"
 
-(Code of this application is just tweaking around "tview" widgets.)
+(Code of this application is mostly tweaking around "tview" widgets.)
 
-On Linux for clipboard operations to work there is need to install "xclip" .
+On Linux there is need to install "xclip", otherwise clipboard operations will not work.
 
-# Platform Support
+## Platform Support
 
-Code was developed on Windows 10. Linux (Ubuntu 18.04) seems to be OK as well (just don't forget to install "xclip"). 
-For MAC code compiles but I never tried it.
+Code was developed on Windows 10. Linux (Ubuntu 18.04) seems to be OK (just don't forget to install "xclip").  For MAC code compiles but nobody tried it.
 
-# Mouse Support
+## Mouse Support
 
 Package "tview" does not support mouse and the same is true about this application. 
 
-# Known problem
+## Demo
+To run the demo:
+* Clone the project from the Github: git clone https://github/jumbleview/tspur
+* Move to the directory "tspur".
+* Build executable: go build
+* Move to the directory ../demo.
+* Start either start.bat (Windows) or start.sh (Linux). As password enter word "password".
 
-If size of the terminal windows is changed dynamically structure of the table becomes broken. You can fix it by going back and force between top menu and the table.
+## Known problem
+
+On Windows, if size of the terminal windows is changed dynamically (by dragging console corner by mouse, for example), structure of the table becomes broken. You can fix it by going back and force between top menu and the table.
 
 
