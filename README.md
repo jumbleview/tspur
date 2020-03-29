@@ -15,7 +15,7 @@ Application starts with single argument: path to the file with data storage. Sto
 
 At start application puts focus on the top menu. Hitting "Enter", while button "Select" is in focus, move the focus to the table.  To put focus  back on the top menu use "Esc".To navigate through the menu or the table use arrow keys.
 
-Number of table rows and columns is unlimited but it is unlikely somebody will use more then hundred rows or more then 3..5 columns. Each rows contains one cell (Record Name), which is always visible, and several values. Values on each row may be either all visible or all hidden.
+Number of table rows and columns is unlimited but it is unlikely somebody will use more than hundred rows or more then 3..5 columns. Each rows contains one cell (Record Name), which is always visible, and several values. Values on each row may be either all visible or all hidden.
 
 ## Application Modes
 
