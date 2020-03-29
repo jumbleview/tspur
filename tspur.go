@@ -94,7 +94,7 @@ func main() {
 	}
 	var tspr Spur
 
-	var GoldenBears = SpurTheme{
+	var GoldenBears = SpurTheme{ // To honor Cal Football team
 		MainColor:                tcell.ColorWhite,
 		MainBackgroundColor:      tcell.ColorDarkBlue,
 		AccentColor:              tcell.ColorGold,

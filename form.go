@@ -244,7 +244,8 @@ func (spr *Spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 	pwdFlex.AddItem(spr.form, 0, 2, true)
-	pwdFlex.SetBackgroundColor(spr.FormInputBackgroundColor)
+	pwdFlex.SetBackgroundColor(spr.FormBackgroundColor)
+
 	pwdFlex.SetTitle(title)
 	pwdFlex.SetBorder(true) // In case of true border is on black background
 	modal := CompoundModal(pwdFlex, 40, 11)
