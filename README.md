@@ -33,13 +33,13 @@ Application supports four modes:
 
 ## Entering the Data
 
-User may add new records (button "Add") or edit existing (button "Edit"). To start edit existing record select it first, then by "Esc" go to the top menu and hit button "Edit". Record maybe extended with one extra value. If there is need to add several extra values repeat the process several times.
+User may add new records (button "Add") or edit existing (button "Edit"). To edit existing record select record on the table, then by "Esc" go to the top menu and hit button "Edit". Record maybe extended with one extra value. If there is need to add several extra values repeat the process several times.
 
 ![TSPUR_EDIT](./images/tspur_edit.png)
 
 ## Dependency
 
-It is pure go application (no cgo needed). All the heavy lifting is done by three imported packages (and there dependencies):
+It is pure go application (no cgo needed). All the heavy lifting is done by three imported packages (and their dependencies):
 
 	"github.com/rivo/tview"
 	"github.com/gdamore/tcell"
@@ -60,10 +60,10 @@ Package "tview" does not support mouse and the same is true about this applicati
 ## Demo
 To run the demo:
 * Clone the project from the Github: git clone https://github/jumbleview/tspur
-* Move to the directory "tspur".
+* Go to the directory "tspur".
 * Build executable: go build
-* Move to the directory ../demo.
-* Invoke either start.bat (Windows) or start.sh (Linux). As password enter word "password".
+* Go to the directory ../demo.
+* Invoke either start.bat (Windows) or start.sh (Linux). As the password enter word "password".
 
 ## Known problem
 
