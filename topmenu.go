@@ -22,16 +22,14 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	spr.topMenu.SetBackgroundColor(spr.MainBackgroundColor)
 	spr.topMenu.SetButtonBackgroundColor(spr.MainBackgroundColor)
 	spr.topMenu.SetButtonTextColor(spr.AccentColor)
-	fselect := func() {
 
+	spr.topMenu.AddButton("Select", func() {
 		spr.MoveFocusToTable(app)
-
 		row, col := spr.table.GetSelection()
 		if row < 1 || col < 1 {
 			row = 1
 			col = 1
 		}
-		//cell := spr.table.GetCell(row, col)
 		spr.activeRow = row
 		spr.activeColumn = col
 		if spr.mode == ModeVisibleSelect {
@@ -40,8 +38,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 			spr.ToClipBoard(row, col)
 		}
 		spr.arrowBarrier = -1
-	}
-	spr.topMenu.AddButton("Select", fselect)
+	})
 
 	spr.topMenu.AddButton("Mode", func() {
 		spr.MakeModeTable(app)
@@ -140,10 +137,33 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	fexit := func() {
-		clipboard.WriteAll("")
-		app.Stop()
+		saveLabel := spr.topMenu.GetButton(spr.saveMenuInx).GetLabel()
+		if saveLabel == "Save" { // nothong to save. Just exit
+			clipboard.WriteAll("")
+			app.Stop()
+			return
+		}
+		modal := tview.NewModal()
+		modal.SetBackgroundColor(spr.FormBackgroundColor)
+		modal.SetButtonBackgroundColor(spr.FormBackgroundColor)
+		modal.SetTextColor(spr.FormColor)
+		modal.SetButtonTextColor(spr.FormColor)
+		modal.SetText("Page not saved. Exit?")
+		modal.AddButtons([]string{"Exit", "Cancel"})
+		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Exit" {
+				clipboard.WriteAll("")
+				app.Stop()
+			} else {
+				spr.root.RemovePage(ModalName)
+				app.SetFocus(spr.topMenu)
+			}
+		})
+		modalo := CompoundModal(modal, 15, 5)
+		spr.root = spr.root.AddPage(ModalName, modalo, true, true)
+		app.SetRoot(spr.root, true)
+		app.SetFocus(modal)
 	}
-
 	spr.topMenu.AddButton("Exit", fexit)
 	spr.saveMenuInx = spr.topMenu.GetButtonIndex("Save")
 	return nil
