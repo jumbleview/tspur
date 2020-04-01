@@ -37,7 +37,7 @@ User may add new records (button "Add") or edit existing (button "Edit"). To edi
 
 ![TSPUR_EDIT](./images/tspur_edit.png)
 
-## Dependency
+## Dependencies
 
 It is pure go application (no cgo needed). All the heavy lifting is done by three imported packages (and their dependencies):
 
@@ -59,6 +59,7 @@ Package "tview" does not support mouse and the same is true about this applicati
 
 ## Demo
 To run the demo:
+* Go compiler must be installed. (Application was developed with Go 1.14. Early version may be OK as well).
 * Clone the project from the Github: git clone https://github/jumbleview/tspur
 * Go to the directory "tspur".
 * Build executable: go build

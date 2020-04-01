@@ -300,3 +300,13 @@ func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 	app.SetFocus(modal)
 	return nil
 }
+
+// MakeNewModal creates new modal objects and provide its color setting
+func (spr *Spur) MakeNewModal() *tview.Modal {
+	modal := tview.NewModal()
+	modal.SetBackgroundColor(spr.FormBackgroundColor)
+	modal.SetButtonBackgroundColor(spr.FormBackgroundColor)
+	modal.SetTextColor(spr.FormColor)
+	modal.SetButtonTextColor(spr.FormColor)
+	return modal
+}

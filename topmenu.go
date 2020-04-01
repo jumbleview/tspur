@@ -44,16 +44,14 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		spr.MakeModeTable(app)
 	})
 
-	addHidden := func() {
+	spr.topMenu.AddButton("Add", func() {
 		spr.activeRow = -1
 		spr.MakeForm(app, "h")
 		modal := CompoundModal(spr.form, 45, 15)
 		spr.root = spr.root.AddPage(ModalName, modal, true, true)
 		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
-	}
-
-	spr.topMenu.AddButton("Add", addHidden)
+	})
 
 	spr.topMenu.AddButton("Edit", func() {
 		visibility := "v"
@@ -69,11 +67,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	spr.topMenu.AddButton("Delete", func() {
-		modal := tview.NewModal()
-		modal.SetBackgroundColor(spr.FormBackgroundColor)
-		modal.SetButtonBackgroundColor(spr.FormBackgroundColor)
-		modal.SetTextColor(spr.FormColor)
-		modal.SetButtonTextColor(spr.FormColor)
+		modal := spr.MakeNewModal()
 		var key string
 		if spr.activeRow > 0 {
 			key = spr.keys[spr.activeRow-1]
@@ -109,12 +103,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	spr.topMenu.AddButton("Save", func() {
-		//spr.MakeSaveForm(app, "")
-		modal := tview.NewModal()
-		modal.SetBackgroundColor(spr.FormBackgroundColor)
-		modal.SetButtonBackgroundColor(spr.FormBackgroundColor)
-		modal.SetTextColor(spr.FormColor)
-		modal.SetButtonTextColor(spr.FormColor)
+		modal := spr.MakeNewModal()
 		modal.SetText("Save page?")
 		modal.AddButtons([]string{"Save", "Cancel"})
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
@@ -136,18 +125,14 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		spr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)
 	})
 
-	fexit := func() {
+	spr.topMenu.AddButton("Exit", func() {
 		saveLabel := spr.topMenu.GetButton(spr.saveMenuInx).GetLabel()
-		if saveLabel == "Save" { // nothong to save. Just exit
+		if saveLabel == "Save" { // nothing to save. Just exit
 			clipboard.WriteAll("")
 			app.Stop()
 			return
 		}
-		modal := tview.NewModal()
-		modal.SetBackgroundColor(spr.FormBackgroundColor)
-		modal.SetButtonBackgroundColor(spr.FormBackgroundColor)
-		modal.SetTextColor(spr.FormColor)
-		modal.SetButtonTextColor(spr.FormColor)
+		modal := spr.MakeNewModal()
 		modal.SetText("Page not saved. Exit?")
 		modal.AddButtons([]string{"Exit", "Cancel"})
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
@@ -163,8 +148,8 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		spr.root = spr.root.AddPage(ModalName, modalo, true, true)
 		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
-	}
-	spr.topMenu.AddButton("Exit", fexit)
+	})
+
 	spr.saveMenuInx = spr.topMenu.GetButtonIndex("Save")
 	return nil
 }
