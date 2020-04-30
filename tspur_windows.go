@@ -11,6 +11,5 @@ import (
 func SetDimensions(cols int, lines int) {
 	columns := fmt.Sprintf("cols=%d", cols)
 	rows := fmt.Sprintf("lines=%d", lines)
-	setMode := exec.Command("mode", "con:", columns, rows)
-	setMode.Run()
+	exec.Command("mode", "con:", columns, rows).Output()
 }

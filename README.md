@@ -4,6 +4,8 @@ TSPUR is the terminal application  with some user records presented as a table. 
 
 ![TSPUR](./images/tspur.png)
 
+Some more details you can find here: http://www.jumbleview.info/2020/04/here-we-go.html
+
 ## General Description
 
 Terminal screen consists of two areas:
@@ -39,7 +41,7 @@ User may add new records (button "Add") or edit existing (button "Edit"). To edi
 
 ## Dependencies
 
-It is pure go application (no cgo needed). All the heavy lifting is done by three imported packages (and their dependencies):
+It is pure Go application (no cgo needed). All the heavy lifting is done by three imported packages (and their dependencies):
 
 	"github.com/rivo/tview"
 	"github.com/gdamore/tcell"
@@ -55,16 +57,24 @@ Code was developed on Windows 10. Linux (Ubuntu 18.04) seems to be OK (just don'
 
 ## Mouse Support
 
-Package "tview" does not support mouse and the same is true about this application. 
+When development started package "tview" did not have mouse support yet so this project does not support mouse. While now "tview" supports mouse that support is not extended for "tspur" yet. Does it really make a sense to extend?
 
 ## Demo
-To run the demo:
+To build executable and run the demo:
 * Go compiler must be installed. (Application was developed with Go 1.14. Early version may be OK as well).
 * Clone the project from the Github: git clone https://github/jumbleview/tspur
 * Go to the directory "tspur".
-* Build executable: go build
+* Build the executable: go build
 * Go to the directory ../demo.
 * Invoke either start.bat (Windows) or start.sh (Linux). As the password enter word "password".
+
+## Git integration
+Optional and limited integration with Git does exists. It provides chain git operations on modified encoded storage, namely:
+* At Start "tspur" checks if storage lays in the directory with valid git working tree.
+* If above is "true" button "Git" included in to the top menu.
+* That button triggers chain if git actions, namely: it stages storage file, commit, and push commit result to remote.
+
+Integration does not use any Go git package, just invokes consol operation of  "git" commands. Setting the account with Git provider, creating remote directory (most likely private) etc. is out of scope for this application.
 
 ## Known problem
 

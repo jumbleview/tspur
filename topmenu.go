@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -110,6 +112,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 			if buttonLabel == "Save" {
 				spr.Save()
 				spr.topMenu.GetButton(spr.saveMenuInx).SetLabel("Save")
+				if spr.topMenu.GetButton(spr.saveMenuInx+1).GetLabel() == "Git" {
+					spr.topMenu.GetButton(spr.saveMenuInx + 1).SetLabel("Git!")
+				}
 			}
 			spr.root.RemovePage(ModalName)
 			app.SetFocus(spr.topMenu)
@@ -119,7 +124,39 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
 	})
+	if CheckGit(spr.cribPath) == nil {
+		spr.topMenu.AddButton("Git", func() {
+			modal := spr.MakeNewModal()
+			modal.SetText("Push to remote?")
+			modal.AddButtons([]string{"Yes", "No"})
+			attempt := 0
+			modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+				if attempt == 0 && buttonLabel == "Yes" {
+					modal.SetText("Pushing...")
+					app.ForceDraw()
+					txt, err := PushRemote(spr.cribPath, spr.cribBase, spr.commits)
+					spr.commits = spr.commits[:0] // make it empty for the next commit
+					attempt = 1
+					if err != nil {
+						txt = fmt.Sprintf("%s%s", txt, err)
+					}
+					modal.SetText(txt)
+					modal.ClearButtons()
+					modal.AddButtons([]string{"OK"})
+					app.ForceDraw()
+				} else {
+					spr.topMenu.GetButton(spr.saveMenuInx + 1).SetLabel("Git")
+					spr.root.RemovePage(ModalName)
+					app.SetFocus(spr.topMenu)
+				}
+			})
+			modalo := CompoundModal(modal, 15, 5)
+			spr.root = spr.root.AddPage(ModalName, modalo, true, true)
+			app.SetRoot(spr.root, true)
+			app.SetFocus(modal)
+		})
 
+	}
 	spr.topMenu.AddButton("Password", func() {
 		needOldPassword := true
 		spr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)

@@ -89,9 +89,13 @@ func (spr *Spur) Visualize(row int, column int) {
 // UpdateRecords add or update element to the records or delete it if values=nil
 func (spr *Spur) UpdateRecords(key string, values []string, visibility string) int {
 	if values == nil { // delete element from the records
+		s := key + " deleted"
+		spr.commits = append(spr.commits, s)
 		delete(spr.records, key)
 		delete(spr.visibility, key)
 	} else { // add or update records and visibility maps
+		s := key + " changed"
+		spr.commits = append(spr.commits, s)
 		spr.records[key] = values
 		spr.visibility[key] = visibility
 	}

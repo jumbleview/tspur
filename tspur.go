@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
@@ -29,7 +30,7 @@ const ModeVisibleSelect = "Visible-on-Select"
 const ArrowDefaultBarrier = -1
 
 // ConsoleWidth is console horizontal dimension
-const ConsoleWidth = 80
+const ConsoleWidth = 85
 
 // ConsoleHeight is console vertical dimension
 const ConsoleHeight = 45
@@ -68,9 +69,13 @@ type Spur struct {
 	activeColumn int
 	passwd       string
 	cribName     string
+	cribPath     string
+	cribBase     string
 	mode         string
 	saveMenuInx  int
 	arrowBarrier int
+	// to collect comments for commit
+	commits []string
 	// assigned color theme
 	SpurTheme
 }
@@ -111,7 +116,9 @@ func main() {
 	tspr.root = tview.NewPages()
 	tspr.cribName = cmd[0]
 	_, errFile := os.Stat(tspr.cribName)
-
+	tspr.cribPath = filepath.Dir(tspr.cribName)
+	tspr.cribBase = filepath.Base(tspr.cribName)
+	SetDimensions(ConsoleWidth, ConsoleHeight)
 	tspr.MakeTopMenu(app)
 	tspr.MakeBaseTable(app)
 	tspr.flex = tview.NewFlex()
@@ -148,8 +155,14 @@ func main() {
 	if errFile == nil {
 		tspr.MakeEnterPasswordForm(app, "Enter Password:")
 	} else {
-		needOldPassword := false
-		tspr.MakeNewPasswordForm(app, "Create new Page", needOldPassword)
+		_, errFile = os.Stat(tspr.cribPath)
+		if errFile != nil {
+			clipboard.WriteAll("")
+			panic(errFile)
+		} else {
+			needOldPassword := false
+			tspr.MakeNewPasswordForm(app, "Create new Page", needOldPassword)
+		}
 	}
 	if err := app.Run(); err != nil {
 		clipboard.WriteAll("")
