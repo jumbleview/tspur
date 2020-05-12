@@ -6,8 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	//"github.com/atotto/clipboard"
-	"github.com/d-tsuji/clipboard"
+	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
@@ -149,8 +148,7 @@ func main() {
 
 		}
 		if event.Key() == tcell.KeyCtrlC {
-			//clipboard.WriteAll(event.Name())
-			clipboard.Set(event.Name())
+			clipboard.WriteAll(event.Name())
 		}
 		return event
 	})
@@ -159,8 +157,7 @@ func main() {
 	} else {
 		_, errFile = os.Stat(tspr.cribPath)
 		if errFile != nil {
-			//clipboard.WriteAll("")
-			clipboard.Set("")
+			clipboard.WriteAll("")
 			panic(errFile)
 		} else {
 			needOldPassword := false
@@ -169,8 +166,7 @@ func main() {
 	}
 	app.EnableMouse(false)
 	if err := app.Run(); err != nil {
-		//clipboard.WriteAll("")
-		clipboard.Set("")
+		clipboard.WriteAll("")
 		panic(err)
 	}
 }

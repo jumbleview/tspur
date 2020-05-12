@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 
-	//"github.com/atotto/clipboard"
-	"github.com/d-tsuji/clipboard"
+	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
@@ -166,8 +165,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	spr.topMenu.AddButton("Exit", func() {
 		saveLabel := spr.topMenu.GetButton(spr.saveMenuInx).GetLabel()
 		if saveLabel == "Save" { // nothing to save. Just exit
-			//clipboard.WriteAll("")
-			clipboard.Set("")
+			clipboard.WriteAll("")
 			app.Stop()
 			return
 		}
@@ -176,8 +174,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		modal.AddButtons([]string{"Exit", "Cancel"})
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Exit" {
-				//clipboard.WriteAll("")
-				clipboard.Set("")
+				clipboard.WriteAll("")
 				app.Stop()
 			} else {
 				spr.root.RemovePage(ModalName)
