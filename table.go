@@ -5,7 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/atotto/clipboard"
+	// "github.com/atotto/clipboard"
+	"github.com/d-tsuji/clipboard"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
@@ -29,7 +30,8 @@ func (spr *Spur) ToClipBoard(row int, column int) {
 			value = ""
 		}
 	}
-	clipboard.WriteAll(value)
+	//clipboard.WriteAll(value)
+	clipboard.Set(value)
 }
 
 // AttachData initialize spur and attaches data to it

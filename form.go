@@ -3,7 +3,8 @@ package main
 import (
 	"strconv"
 
-	"github.com/atotto/clipboard"
+	// "github.com/atotto/clipboard"
+	"github.com/d-tsuji/clipboard"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
@@ -59,12 +60,14 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 		}
 		locali := i
 		accepted := func(inp string, last rune) bool {
-			clipboard.WriteAll(inp)
+			//clipboard.WriteAll(inp)
+			clipboard.Set(inp)
 			return true
 		}
 		changed := func(inp string) {
 			v[locali] = inp
-			clipboard.WriteAll(inp)
+			//clipboard.WriteAll(inp)
+			clipboard.Set(inp)
 		}
 		if vsbl == "h" {
 			spr.form.AddPasswordField(valName, v[i], 21, '*', changed)
