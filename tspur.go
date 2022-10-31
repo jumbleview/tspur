@@ -89,7 +89,7 @@ func main() {
 	var Usage = func() {
 		fmt.Fprintf(os.Stderr, greeting)
 	}
-	flag.String("-h", "help", greeting)
+	flag.String("h", "help", greeting)
 	flag.Parse()
 	cmd := flag.Args()
 	if len(cmd) != 1 {
