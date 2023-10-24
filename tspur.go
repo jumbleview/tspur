@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"unicode"
 
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell"
@@ -129,6 +131,19 @@ func main() {
 	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)
 	app.SetFocus(tspr.flex)
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if tspr.table.HasFocus() {
+			if (event.Key() == tcell.KeyRune) && unicode.IsLetter(event.Rune()) {
+				runeAsString := strings.ToUpper(string(event.Rune()))
+				for ix, ky := range tspr.keys {
+					if strings.ToUpper(ky) >= runeAsString {
+						tspr.table.Select(ix+1, 1)
+						break
+					}
+				}
+				// Hack to fool table input not to process some keys (like H and G) as special
+				return tcell.NewEventKey(tcell.KeyDelete, 0x7F, 0)
+			}
+		}
 		if tspr.topMenu.HasFocus() || tspr.arrowBarrier > ArrowDefaultBarrier {
 			_, buttonI := tspr.form.GetFocusedItemIndex()
 			if tspr.topMenu.HasFocus() || buttonI >= tspr.arrowBarrier {
