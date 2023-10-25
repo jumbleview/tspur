@@ -140,8 +140,8 @@ func main() {
 						break
 					}
 				}
-				// Hack to fool table input not to process some keys (like H and G) as special
-				return tcell.NewEventKey(tcell.KeyDelete, 0x7F, 0)
+				// to suppress letter of novigsting the table apart of above
+				return nil
 			}
 		}
 		if tspr.topMenu.HasFocus() || tspr.arrowBarrier > ArrowDefaultBarrier {
