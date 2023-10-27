@@ -179,7 +179,7 @@ func main() {
 			tspr.MakeNewPasswordForm(app, "Create new Page", needOldPassword)
 		}
 	}
-	app.EnableMouse(false)
+	app.EnableMouse(true)
 	if err := app.Run(); err != nil {
 		clipboard.WriteAll("")
 		panic(err)

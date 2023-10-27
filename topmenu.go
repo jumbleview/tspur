@@ -43,10 +43,16 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	spr.topMenu.AddButton("Mode", func() {
+		spr.Hide(spr.activeRow, spr.activeColumn)
+		spr.table.SetSelectable(false, false)
+
 		spr.MakeModeTable(app)
 	})
 
 	spr.topMenu.AddButton("Add", func() {
+		spr.Hide(spr.activeRow, spr.activeColumn)
+		spr.table.SetSelectable(false, false)
+
 		spr.activeRow = -1
 		spr.MakeForm(app, "h")
 		modal := CompoundModal(spr.form, 45, 15)
@@ -56,6 +62,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	spr.topMenu.AddButton("Edit", func() {
+		spr.Hide(spr.activeRow, spr.activeColumn)
+		spr.table.SetSelectable(false, false)
+
 		visibility := "v"
 		if spr.activeRow > 0 {
 			visibility = spr.visibility[spr.keys[spr.activeRow-1]]
@@ -69,6 +78,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	spr.topMenu.AddButton("Delete", func() {
+		spr.Hide(spr.activeRow, spr.activeColumn)
+		spr.table.SetSelectable(false, false)
+
 		modal := spr.MakeNewModal()
 		var key string
 		if spr.activeRow > 0 {
@@ -105,6 +117,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	spr.topMenu.AddButton("Save", func() {
+		spr.Hide(spr.activeRow, spr.activeColumn)
+		spr.table.SetSelectable(false, false)
+
 		modal := spr.MakeNewModal()
 		modal.SetText("Save page?")
 		modal.AddButtons([]string{"Save", "Cancel"})
@@ -158,6 +173,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 
 	}
 	spr.topMenu.AddButton("Password", func() {
+		spr.Hide(spr.activeRow, spr.activeColumn)
+		spr.table.SetSelectable(false, false)
+
 		needOldPassword := true
 		spr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)
 	})
