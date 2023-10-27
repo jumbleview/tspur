@@ -44,7 +44,7 @@ User may add new records (button "Add") or edit existing (button "Edit"). To edi
 It is pure Go application (no cgo needed). All the heavy lifting is done by three imported packages (and their dependencies):
 
 	"github.com/rivo/tview"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"github.com/atotto/clipboard"
 
 (Code of this application is mostly tweaking around "tview" widgets.)
@@ -53,11 +53,11 @@ On Linux there is need to install "xclip", otherwise clipboard operations will n
 
 ## Platform Support
 
-Code was developed on Windows 10. Linux (Ubuntu 18.04) seems to be OK (just don't forget to install "xclip").  For MAC code compiles but nobody tried it.
+Code was developed on Windows 10. On Windows 11 it wokrs, but instead  of default Windows Terminal  usage of conhost is recomended .  Linux (Ubuntu 18.04) seems to be OK (just don't forget to install "xclip").  For MAC code compiles but nobody tried it.
 
 ## Mouse Support
+Mouse is supported. It is possible to use mouse or keyboard navigation/selection interchangeably.  
 
-When development started package "tview" did not have mouse support yet so this project does not support mouse. While now "tview" supports mouse that support is not extended for "tspur" yet. Does it really make a sense to extend?
 
 ## Demo
 To build executable and run the demo:
