@@ -25,13 +25,20 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	spr.topMenu.SetButtonBackgroundColor(spr.MainBackgroundColor)
 	spr.topMenu.SetButtonTextColor(spr.AccentColor)
 
+	spr.topMenu.AddButton("Mode:"+ModeClipEnter, func() {
+		spr.Hide(spr.activeRow, spr.activeColumn)
+		spr.table.SetSelectable(false, false)
+		spr.isLastEventMouse = false
+		spr.MakeModeTable(app)
+	})
+
 	spr.topMenu.AddButton("Select", func() {
 		spr.MoveFocusToTable(app)
 		row, col := spr.table.GetSelection()
-		if row < 1 || col < 1 {
-			row = 1
-			col = 1
-		}
+		// if row < 1 || col < 1 {
+		// 	row = 1
+		// 	col = 1
+		// }
 		spr.activeRow = row
 		spr.activeColumn = col
 		if spr.mode == ModeVisibleSelect {
@@ -39,14 +46,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		} else if spr.mode == ModeClipSelect {
 			spr.ToClipBoard(row, col)
 		}
-		spr.arrowBarrier = -1
-	})
-
-	spr.topMenu.AddButton("Mode", func() {
-		spr.Hide(spr.activeRow, spr.activeColumn)
-		spr.table.SetSelectable(false, false)
-
-		spr.MakeModeTable(app)
+		// spr.arrowBarrier = -1
 	})
 
 	spr.topMenu.AddButton("Add", func() {
@@ -55,7 +55,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 
 		spr.activeRow = -1
 		spr.MakeForm(app, "h")
-		modal := CompoundModal(spr.form, 45, 15)
+		modal := CompoundModal(spr.form, 37, 15)
 		spr.root = spr.root.AddPage(ModalName, modal, true, true)
 		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)

@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -66,7 +65,7 @@ func EncryptFile(filename string, data []byte, passphrase string) error {
 
 // DecryptFile reads encrypted file and returns plain text as byte slice
 func DecryptFile(filename string, passphrase string) ([]byte, error) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}

@@ -216,6 +216,7 @@ func (spr *Spur) MakeBaseTable(app *tview.Application) {
 		case ModeClipEnter:
 			spr.ToClipBoard(row, column)
 		case ModeClipSelect: // nothing to do
+			spr.ToClipBoard(row, column)
 		case ModeVisibleEnter:
 			spr.Visualize(row, column)
 		case ModeVisibleSelect: // nothing to do

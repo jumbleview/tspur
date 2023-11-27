@@ -160,6 +160,7 @@ func (spr *Spur) MakeModeTable(app *tview.Application) error {
 
 	spr.modes.SetSelectedFunc(func(row, column int) {
 		spr.mode = modesSet[row]
+		spr.topMenu.GetButton(0).SetLabel("Mode:" + spr.mode)
 		spr.modes.Clear()
 		spr.root.RemovePage(ModalName)
 		app.SetFocus(spr.topMenu)
@@ -172,6 +173,17 @@ func (spr *Spur) MakeModeTable(app *tview.Application) error {
 			app.SetFocus(spr.topMenu)
 		}
 	})
+	spr.modes.SetSelectionChangedFunc(func(row, column int) {
+		spr.mode = modesSet[row]
+		spr.topMenu.GetButton(0).SetLabel("Mode:" + spr.mode)
+		if !spr.isLastEventMouse {
+			return
+		}
+		spr.modes.Clear()
+		spr.root.RemovePage(ModalName)
+		app.SetFocus(spr.topMenu)
+	})
+
 	spr.modes.SetSelectable(true, true)
 	var i int
 	for i = range modesSet {
@@ -185,7 +197,7 @@ func (spr *Spur) MakeModeTable(app *tview.Application) error {
 	pwdFlex.SetBackgroundColor(spr.FormBackgroundColor)
 	pwdFlex.SetTitle("Mode:")
 	pwdFlex.SetBorder(true)
-	modal := CompoundModal(pwdFlex, 21, 6)
+	modal := CompoundModal(pwdFlex, len(ModeClipSelect)+3, 6)
 	spr.root = spr.root.AddPage(ModalName, modal, true, true)
 	app.SetRoot(spr.root, true)
 	app.SetFocus(modal)
@@ -270,9 +282,19 @@ func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 		if err == nil {
 			spr.AttachData(data, passwd)
 			spr.UpdateTable(app)
+			spr.activeRow = 1
+			spr.activeColumn = 1
+			if spr.mode == ModeVisibleSelect {
+				spr.Visualize(spr.activeRow, spr.activeColumn)
+			} else if spr.mode == ModeClipSelect {
+				spr.ToClipBoard(spr.activeRow, spr.activeColumn)
+			}
+			spr.arrowBarrier = -1
+
 			spr.form.Clear(true)
 			spr.root.RemovePage(ModalName)
-			app.SetFocus(spr.topMenu)
+			spr.MoveFocusToTable(app)
+			// app.SetFocus(spr.topMenu)
 		} else {
 			spr.form.Clear(true)
 			spr.root.RemovePage(ModalName)

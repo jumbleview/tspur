@@ -17,22 +17,22 @@ import (
 const ModalName = "modal"
 
 // ModeClipEnter means cell text copied into clipboard when Enter pressed
-const ModeClipEnter = "Clipboard-on-Enter"
+const ModeClipEnter = "copy-on-enter"
 
 // ModeClipSelect means cell text copied when selected
-const ModeClipSelect = "Clipboard-on-Select"
+const ModeClipSelect = "copy-on-select"
 
 // ModeVisibleEnter means cell made visual when Enter pressed
-const ModeVisibleEnter = "Visible-on-Enter"
+const ModeVisibleEnter = "show-on-enter"
 
 // ModeVisibleSelect means cell mode visual when selected
-const ModeVisibleSelect = "Visible-on-Select"
+const ModeVisibleSelect = "show-on-select"
 
 // ArrowDefaultBarrier tells at which index to turn on Arrows key converting
 const ArrowDefaultBarrier = -1
 
 // ConsoleWidth is console horizontal dimension
-const ConsoleWidth = 85
+const ConsoleWidth = 99
 
 // ConsoleHeight is console vertical dimension
 const ConsoleHeight = 45
@@ -63,19 +63,20 @@ type Spur struct {
 	modes   *tview.Table // table to select mode
 
 	// tspr underline data
-	keys         []string
-	records      map[string][]string
-	visibility   map[string]string
-	width        int
-	activeRow    int
-	activeColumn int
-	passwd       string
-	cribName     string
-	cribPath     string
-	cribBase     string
-	mode         string
-	saveMenuInx  int
-	arrowBarrier int
+	isLastEventMouse bool
+	keys             []string
+	records          map[string][]string
+	visibility       map[string]string
+	width            int
+	activeRow        int
+	activeColumn     int
+	passwd           string
+	cribName         string
+	cribPath         string
+	cribBase         string
+	mode             string
+	saveMenuInx      int
+	arrowBarrier     int
 	// to collect comments for commit
 	commits []string
 	// assigned color theme
@@ -101,7 +102,7 @@ func main() {
 	}
 	var tspr Spur
 
-	var GoldenBears = SpurTheme{ // To honor Cal Football team
+	var Norton = SpurTheme{ // Close to popular DOS file manager
 		MainColor:                tcell.ColorWhite,
 		MainBackgroundColor:      tcell.ColorDarkBlue,
 		AccentColor:              tcell.ColorGold,
@@ -111,7 +112,7 @@ func main() {
 		FormInputBackgroundColor: tcell.ColorDarkBlue,
 	}
 
-	tspr.SpurTheme = GoldenBears
+	tspr.SpurTheme = Norton
 
 	app := tview.NewApplication()
 
@@ -131,6 +132,7 @@ func main() {
 	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)
 	app.SetFocus(tspr.flex)
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		tspr.isLastEventMouse = false
 		if tspr.table.HasFocus() {
 			if (event.Key() == tcell.KeyRune) && unicode.IsLetter(event.Rune()) {
 				runeAsString := strings.ToUpper(string(event.Rune()))
@@ -140,7 +142,7 @@ func main() {
 						break
 					}
 				}
-				// to suppress letter of novigsting the table apart of above
+				// to suppress letter of navigating the table apart of above
 				return nil
 			}
 		}
@@ -179,6 +181,17 @@ func main() {
 			tspr.MakeNewPasswordForm(app, "Create new Page", needOldPassword)
 		}
 	}
+	app.SetMouseCapture(func(event *tcell.EventMouse, action tview.MouseAction) (*tcell.EventMouse, tview.MouseAction) {
+		tspr.isLastEventMouse = true
+		if tspr.topMenu.HasFocus() && action == tview.MouseLeftDown {
+			_, eventY := event.Position()
+			_, tableY, _, _ := tspr.table.GetRect()
+			if eventY > tableY { // mouse clicked in the table area
+				tspr.MoveFocusToTable(app)
+			}
+		}
+		return event, action
+	})
 	app.EnableMouse(true)
 	if err := app.Run(); err != nil {
 		clipboard.WriteAll("")
