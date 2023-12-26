@@ -28,6 +28,8 @@ const ModeVisibleEnter = "show-on-enter"
 // ModeVisibleSelect means cell mode visual when selected
 const ModeVisibleSelect = "show-on-select"
 
+var modeSet [4]string = [4]string{ModeClipEnter, ModeClipSelect, ModeVisibleEnter, ModeVisibleSelect}
+
 // ArrowDefaultBarrier tells at which index to turn on Arrows key converting
 const ArrowDefaultBarrier = -1
 
@@ -44,7 +46,7 @@ const TableProportion = 7
 // SpurTheme is color theme matched to tspur design
 type SpurTheme struct {
 	MainColor                tcell.Color // Font colors of the table
-	MainBackgroundColor      tcell.Color // Background color of te table and top menu
+	MainBackgroundColor      tcell.Color // Background color of the table and top menu
 	AccentColor              tcell.Color // Color of top menu font and table borders
 	TrackingColor            tcell.Color // Color to illuminate cell hit by ENter key
 	FormColor                tcell.Color // Form font and borders color
@@ -75,12 +77,69 @@ type Spur struct {
 	cribPath         string
 	cribBase         string
 	mode             string
+	modeIndex        int
 	saveMenuInx      int
 	arrowBarrier     int
 	// to collect comments for commit
 	commits []string
 	// assigned color theme
 	SpurTheme
+	// availble modes
+	modeSet *[4]string
+}
+
+type ColorValues struct {
+	Colors     []tcell.Color
+	ColorsList string
+	Count      int
+}
+
+func (v *ColorValues) String() string {
+	return v.ColorsList
+}
+
+func (v *ColorValues) Set(s string) error {
+	if len(s) == 0 {
+		return nil
+	}
+	v.ColorsList = s
+	vals := strings.Split(s, ",")
+	for _, val := range vals {
+		val = strings.Trim(val, " ")
+		color := tcell.GetColor(val)
+		if color == tcell.ColorDefault {
+			return fmt.Errorf("%s is not valid tcell color", val)
+		}
+		v.Colors = append(v.Colors, color)
+	}
+	if len(v.Colors) != v.Count {
+		return fmt.Errorf("Wrong number of colors: %d vs %d", v.Count, len(v.Colors))
+	}
+	return nil
+}
+
+type ModeValue struct {
+	Mode       string
+	ColorsList string
+	Index      int
+}
+
+func (v *ModeValue) String() string {
+	return v.Mode
+}
+
+func (v *ModeValue) Set(s string) error {
+	if len(s) == 0 {
+		return nil
+	}
+	for ix, mode := range modeSet {
+		if mode == s {
+			v.Mode = s
+			v.Index = ix
+			return nil
+		}
+	}
+	return fmt.Errorf("Mode %s is uknown", s)
 }
 
 // tspur is cheat sheet table.
@@ -92,6 +151,28 @@ func main() {
 	var Usage = func() {
 		fmt.Fprintf(os.Stderr, greeting)
 	}
+
+	var mainColors ColorValues
+	mainColors.Count = 2
+	flag.Var(&mainColors, "cm", "two comma separated  colors: font & background")
+
+	var formColors ColorValues
+	formColors.Count = 3
+	flag.Var(&formColors, "cf", "three comma separated  colors: font, background, & input backgorund")
+
+	var trackingColor ColorValues
+	trackingColor.Count = 1
+	flag.Var(&trackingColor, "ct", "single color: font")
+
+	var tsprMode ModeValue
+	var modes []string
+	for _, m := range modeSet {
+		modes = append(modes, m)
+	}
+	possibleModes := "possible values are: " + strings.Join(modes, ",")
+
+	flag.Var(&tsprMode, "md", possibleModes)
+
 	flag.String("h", "help", greeting)
 	flag.Parse()
 	cmd := flag.Args()
@@ -101,18 +182,35 @@ func main() {
 		os.Exit(1)
 	}
 	var tspr Spur
-
-	var Norton = SpurTheme{ // Close to popular DOS file manager
+	tspr.modeSet = &modeSet
+	tspr.mode = tsprMode.Mode
+	tspr.modeIndex = tsprMode.Index
+	var theme = SpurTheme{ // Default is close to popular DOS file manager Norton
 		MainColor:                tcell.ColorWhite,
 		MainBackgroundColor:      tcell.ColorDarkBlue,
-		AccentColor:              tcell.ColorGold,
 		TrackingColor:            tcell.ColorRed,
 		FormColor:                tcell.ColorWhite,
 		FormBackgroundColor:      tcell.ColorDarkCyan,
 		FormInputBackgroundColor: tcell.ColorDarkBlue,
 	}
 
-	tspr.SpurTheme = Norton
+	if len(mainColors.Colors) == 2 {
+		theme.MainColor = mainColors.Colors[0]
+		theme.MainBackgroundColor = mainColors.Colors[1]
+	}
+	theme.AccentColor = theme.MainColor
+
+	if len(formColors.Colors) == 3 {
+		theme.FormColor = formColors.Colors[0]
+		theme.FormBackgroundColor = formColors.Colors[1]
+		theme.FormInputBackgroundColor = formColors.Colors[2]
+	}
+
+	if len(trackingColor.Colors) == 1 {
+		theme.TrackingColor = trackingColor.Colors[0]
+	}
+
+	tspr.SpurTheme = theme
 
 	app := tview.NewApplication()
 

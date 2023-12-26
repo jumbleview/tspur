@@ -24,8 +24,8 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	spr.topMenu.SetBackgroundColor(spr.MainBackgroundColor)
 	spr.topMenu.SetButtonBackgroundColor(spr.MainBackgroundColor)
 	spr.topMenu.SetButtonTextColor(spr.AccentColor)
-
-	spr.topMenu.AddButton("Mode:"+ModeClipEnter, func() {
+	currentMode := spr.modeSet[spr.modeIndex]
+	spr.topMenu.AddButton("Mode:"+currentMode, func() {
 		spr.Hide(spr.activeRow, spr.activeColumn)
 		spr.table.SetSelectable(false, false)
 		spr.isLastEventMouse = false

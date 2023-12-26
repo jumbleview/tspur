@@ -140,7 +140,7 @@ func (spr *Spur) Save() {
 
 // MakeModeTable makes modal  table to choose Mode
 func (spr *Spur) MakeModeTable(app *tview.Application) error {
-	modesSet := [4]string{ModeClipEnter, ModeClipSelect, ModeVisibleEnter, ModeVisibleSelect}
+	//modesSet := [4]string{ModeClipEnter, ModeClipSelect, ModeVisibleEnter, ModeVisibleSelect}
 	spr.modes = tview.NewTable().SetBorders(false)
 
 	spr.modes.SetCell(0, 0, tview.NewTableCell(ModeClipEnter).
@@ -159,7 +159,7 @@ func (spr *Spur) MakeModeTable(app *tview.Application) error {
 		SetBackgroundColor(spr.FormBackgroundColor).SetSelectable(true))
 
 	spr.modes.SetSelectedFunc(func(row, column int) {
-		spr.mode = modesSet[row]
+		spr.mode = spr.modeSet[row]
 		spr.topMenu.GetButton(0).SetLabel("Mode:" + spr.mode)
 		spr.modes.Clear()
 		spr.root.RemovePage(ModalName)
@@ -174,7 +174,7 @@ func (spr *Spur) MakeModeTable(app *tview.Application) error {
 		}
 	})
 	spr.modes.SetSelectionChangedFunc(func(row, column int) {
-		spr.mode = modesSet[row]
+		spr.mode = spr.modeSet[row]
 		spr.topMenu.GetButton(0).SetLabel("Mode:" + spr.mode)
 		if !spr.isLastEventMouse {
 			return
@@ -186,8 +186,8 @@ func (spr *Spur) MakeModeTable(app *tview.Application) error {
 
 	spr.modes.SetSelectable(true, true)
 	var i int
-	for i = range modesSet {
-		if spr.mode == modesSet[i] {
+	for i = range spr.modeSet {
+		if spr.mode == spr.modeSet[i] {
 			break
 		}
 	}

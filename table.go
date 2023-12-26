@@ -177,7 +177,6 @@ func (spr *Spur) UpdateTable(app *tview.Application) error {
 
 // MakeBaseTable makes table to visualize at program start and assigns methods
 func (spr *Spur) MakeBaseTable(app *tview.Application) {
-	spr.mode = ModeClipEnter
 	spr.modes = tview.NewTable().SetBorders(false)
 	spr.table = tview.NewTable().SetBorders(true)
 	spr.table.SetBackgroundColor(spr.MainBackgroundColor)
