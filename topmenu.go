@@ -2,11 +2,39 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell/v2"
+	"github.com/pkg/browser"
 	"github.com/rivo/tview"
 )
+
+func (spr *Spur) SelectTable(app *tview.Application) {
+	spr.MoveFocusToTable(app)
+	row, col := spr.table.GetSelection()
+	// if row < 1 || col < 1 {
+	// 	row = 1
+	// 	col = 1
+	// }
+	spr.activeRow = row
+	spr.activeColumn = col
+	if spr.mode == ModeVisibleSelect {
+		spr.Visualize(row, col)
+	} else if spr.mode == ModeClipSelect {
+		spr.ToClipBoard(row, col)
+	}
+	// spr.arrowBarrier = -1
+}
+
+func FirstToUpper(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	start := s[0:1]
+	rest := s[1:]
+	return strings.ToUpper(start) + rest
+}
 
 // MakeTopMenu makes application top menu to navigate/manipulate table
 func (spr *Spur) MakeTopMenu(app *tview.Application) error {
@@ -21,46 +49,75 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		return event
 	})
 
+	spr.topMenu.AddButton("Select", func() {
+		spr.SelectTable(app)
+	})
+
 	spr.topMenu.SetBackgroundColor(spr.MainBackgroundColor)
 	spr.topMenu.SetButtonBackgroundColor(spr.MainBackgroundColor)
 	spr.topMenu.SetButtonTextColor(spr.AccentColor)
-	currentMode := spr.modeSet[spr.modeIndex]
-	spr.topMenu.AddButton("Mode:"+currentMode, func() {
+	label := FirstToUpper(spr.modeSet[spr.modeIndex])
+
+	spr.topMenu.AddButton(label, func() {
 		spr.Hide(spr.activeRow, spr.activeColumn)
 		spr.table.SetSelectable(false, false)
 		spr.isLastEventMouse = false
 		spr.MakeModeTable(app)
 	})
 
-	spr.topMenu.AddButton("Select", func() {
-		spr.MoveFocusToTable(app)
-		row, col := spr.table.GetSelection()
-		// if row < 1 || col < 1 {
-		// 	row = 1
-		// 	col = 1
-		// }
-		spr.activeRow = row
-		spr.activeColumn = col
-		if spr.mode == ModeVisibleSelect {
-			spr.Visualize(row, col)
-		} else if spr.mode == ModeClipSelect {
-			spr.ToClipBoard(row, col)
-		}
-		// spr.arrowBarrier = -1
-	})
-
-	spr.topMenu.AddButton("Add", func() {
+	spr.topMenu.AddButton("WWW", func() {
 		spr.Hide(spr.activeRow, spr.activeColumn)
 		spr.table.SetSelectable(false, false)
 
-		spr.activeRow = -1
-		spr.MakeForm(app, "h")
-		modal := CompoundModal(spr.form, 37, 15)
-		spr.root = spr.root.AddPage(ModalName, modal, true, true)
+		modal := spr.MakeNewModal()
+		var key, url string
+		if spr.activeRow > 0 {
+			key = spr.keys[spr.activeRow-1]
+		}
+		if spr.activeColumn > 1 {
+			url = spr.records[key][spr.activeColumn-2]
+		}
+
+		if len(url) > 0 {
+			modal.SetText("Go to URL:\n[" + url + "] ?")
+			modal.AddButtons([]string{"Yes", "No"})
+		} else {
+			modal.SetText("Not valid URL\n[" + url + "]")
+			modal.AddButtons([]string{"OK"})
+		}
+		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Yes" {
+				if !strings.HasPrefix(url, "http://") &&
+					!strings.HasPrefix(url, "https://") {
+					url = "http://" + url
+				}
+				browser.OpenURL(url)
+				spr.root.RemovePage(ModalName)
+				spr.MoveFocusToTable(app)
+			} else {
+				spr.root.RemovePage(ModalName)
+				app.SetFocus(spr.topMenu)
+			}
+		})
+		modalo := CompoundModal(modal, 15, 5)
+		spr.root = spr.root.AddPage(ModalName, modalo, true, true)
 		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
-	})
 
+	})
+	/*
+		spr.topMenu.AddButton("Add", func() {
+			spr.Hide(spr.activeRow, spr.activeColumn)
+			spr.table.SetSelectable(false, false)
+
+			spr.activeRow = -1
+			spr.MakeForm(app, "h")
+			modal := CompoundModal(spr.form, 45, 19)
+			spr.root = spr.root.AddPage(ModalName, modal, true, true)
+			app.SetRoot(spr.root, true)
+			app.SetFocus(modal)
+		})
+	*/
 	spr.topMenu.AddButton("Edit", func() {
 		spr.Hide(spr.activeRow, spr.activeColumn)
 		spr.table.SetSelectable(false, false)
@@ -70,7 +127,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 			visibility = spr.visibility[spr.keys[spr.activeRow-1]]
 		}
 		spr.MakeForm(app, visibility)
-		modal := CompoundModal(spr.form, 45, 15)
+		modal := CompoundModal(spr.form, 50, 19)
 		spr.root = spr.root.AddPage(ModalName, modal, true, true)
 		app.SetRoot(spr.root, true)
 		app.SetFocus(modal)
@@ -95,7 +152,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		}
 		modal.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Delete" {
-				spr.UpdateRecords(key, nil, "")
+				spr.UpdateRecord(key, nil, "")
 				spr.activeRow--
 				if spr.activeRow <= 0 {
 					spr.activeRow = 1
@@ -141,6 +198,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 	if CheckGit(spr.cribPath) == nil {
 		spr.topMenu.AddButton("Git", func() {
+			spr.Hide(spr.activeRow, spr.activeColumn)
+			spr.table.SetSelectable(false, false)
+
 			modal := spr.MakeNewModal()
 			modal.SetText("Push to remote?")
 			modal.AddButtons([]string{"Yes", "No"})
@@ -159,6 +219,10 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 					modal.ClearButtons()
 					modal.AddButtons([]string{"OK"})
 					app.ForceDraw()
+
+					app.SetRoot(spr.root, true)
+					app.SetFocus(modal)
+
 				} else {
 					spr.topMenu.GetButton(spr.saveMenuInx + 1).SetLabel("Git")
 					spr.root.RemovePage(ModalName)
@@ -179,7 +243,20 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		needOldPassword := true
 		spr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)
 	})
+	/*
+		spr.topMenu.AddButton("Column", func() {
+			spr.Hide(spr.activeRow, spr.activeColumn)
+			spr.table.SetSelectable(false, false)
 
+			spr.activeRow = -1
+			spr.MakeColumnForm(app, "h")
+			modal := CompoundModal(spr.form, 42, 7)
+			spr.root = spr.root.AddPage(ModalName, modal, true, true)
+			app.SetRoot(spr.root, true)
+			app.SetFocus(modal)
+
+		})
+	*/
 	spr.topMenu.AddButton("Exit", func() {
 		saveLabel := spr.topMenu.GetButton(spr.saveMenuInx).GetLabel()
 		if saveLabel == "Save" { // nothing to save. Just exit

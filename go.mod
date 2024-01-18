@@ -6,6 +6,7 @@ require (
 	github.com/atotto/clipboard v0.1.4
 	github.com/gdamore/tcell/v2 v2.6.0
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/rivo/tview v0.0.0-20231024211518-8b7bcf9883df
 	github.com/rivo/uniseg v0.4.4 // indirect
 	golang.org/x/term v0.13.0 // indirect

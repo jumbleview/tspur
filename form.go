@@ -43,36 +43,47 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 	if spr.activeRow > 0 {
 		k = spr.keys[spr.activeRow-1]
 	}
-	spr.form.AddInputField("Record Name", k, 21, nil, func(inp string) {
-		k = inp
-	})
-	if len(k) > 0 {
-		v = append(v, spr.records[k]...)
+	makeInputFields := func() {
+		v = nil
+		spr.form.AddInputField("Record Name", k, 0, nil, func(inp string) {
+			k = inp
+		})
+
+		if len(k) > 0 {
+			v = append(v, spr.records[k]...)
+		}
+		for i := 0; i <= count; i++ {
+			valName := "Field " + strconv.Itoa(i+1)
+			if i == count {
+				valName = "+"
+			}
+			if i >= len(v) {
+				v = append(v, "")
+			}
+			locali := i
+			accepted := func(inp string, last rune) bool {
+				clipboard.WriteAll(inp)
+				return true
+			}
+			changed := func(inp string) {
+				v[locali] = inp
+				clipboard.WriteAll(inp)
+			}
+			if vsbl == "h" {
+				spr.form.AddPasswordField(valName, v[i], 0, '*', changed)
+			} else {
+				spr.form.AddInputField(valName, v[i], 0, accepted, changed)
+			}
+		}
 	}
-	for i := 0; i <= count; i++ {
-		valName := "Field " + strconv.Itoa(i)
-		if i == count {
-			valName = "+"
-		}
-		if i >= len(v) {
-			v = append(v, "")
-		}
-		locali := i
-		accepted := func(inp string, last rune) bool {
-			clipboard.WriteAll(inp)
-			return true
-		}
-		changed := func(inp string) {
-			v[locali] = inp
-			clipboard.WriteAll(inp)
-		}
-		if vsbl == "h" {
-			spr.form.AddPasswordField(valName, v[i], 21, '*', changed)
-		} else {
-			spr.form.AddInputField(valName, v[i], 21, accepted, changed)
-		}
+	makeInputFields()
+	cancel := func() {
+		spr.form.Clear(true)
+		spr.root.RemovePage(ModalName)
+		app.SetFocus(spr.topMenu)
 	}
-	submit := func(presentation string) {
+
+	spr.form.AddButton("Submit", func() {
 		if len(k) > 0 {
 			_, ok := spr.records[k]
 			if !ok {
@@ -84,29 +95,99 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 				}
 				v = v[:j]
 			}
-			keyPlace := spr.UpdateRecords(k, v, presentation)
+			keyPlace := spr.UpdateRecord(k, v, vsbl)
 			spr.UpdateTable(app)
 			spr.table.Select(keyPlace+1, 1)
 			spr.topMenu.GetButton(spr.saveMenuInx).SetLabel("Save!")
 		}
+
+		spr.form.Clear(true)
+		spr.root.RemovePage(ModalName)
+		spr.MoveFocusToTable(app)
+	})
+	spr.form.AddButton("Hide/Unhide", func() {
+		if vsbl == "h" {
+			vsbl = "v"
+		} else {
+			vsbl = "h"
+		}
+		spr.form.Clear(false)
+		makeInputFields()
+		spr.form.SetFocus(0)
+	})
+
+	spr.form.AddButton("Clear", func() {
+		k = ""
+		spr.activeRow = -1
+		spr.form.Clear(false)
+		makeInputFields()
+		spr.form.SetFocus(spr.form.GetFormItemIndex("Record Name")) // Does not work?
+	})
+
+	spr.arrowBarrier = spr.form.GetButtonIndex("Submit")
+	spr.form.AddButton("Cancel", cancel)
+
+	spr.form.SetCancelFunc(cancel)
+
+	return nil
+}
+
+// MakeColumnForm makes tspr  Form to to insert/delete column in table. So far operations at with very first columnimplemented
+
+func (spr *Spur) MakeColumnForm(app *tview.Application, vsbl string) error {
+	spr.form = tview.NewForm()
+	currentColumn := spr.activeColumn
+	if currentColumn < 2 {
+		currentColumn = 2
 	}
+	currentRow := spr.activeRow
+	title := "Column:" + strconv.Itoa(currentColumn-1)
+	spr.form.SetTitle(title)
+	SetFormColors(spr.form, spr.FormBackgroundColor, spr.FormInputBackgroundColor, spr.FormColor)
+	spr.form.SetBorder(true)
+	count := spr.width
+	if count < 2 {
+		count = 2
+	}
+	var v string
+
+	spr.form.AddInputField("Value", "", 21, nil, func(inp string) {
+		v = inp
+	})
+
+	var sv []string
+	insertColumn := func() {
+		sv = append(sv, v)
+		for k, record := range spr.records {
+			record = append(sv, record...)
+			spr.records[k] = record
+		}
+		spr.UpdateTable(app)
+		spr.table.Select(currentRow, currentColumn)
+		spr.topMenu.GetButton(spr.saveMenuInx).SetLabel("Save!")
+	}
+	deleteColumn := func() {
+		for k, record := range spr.records {
+			record = record[1:]
+			spr.records[k] = record
+		}
+		spr.UpdateTable(app)
+		spr.table.Select(currentRow, currentColumn)
+		spr.topMenu.GetButton(spr.saveMenuInx).SetLabel("Save!")
+	}
+
 	cancel := func() {
 		spr.form.Clear(true)
 		spr.root.RemovePage(ModalName)
 		app.SetFocus(spr.topMenu)
 	}
-	spr.form.AddButton("Save hidden", func() {
-		submit("h")
-		spr.form.Clear(true)
-		spr.root.RemovePage(ModalName)
-		spr.MoveFocusToTable(app)
+	spr.form.AddButton("Insert befor", func() {
+		insertColumn()
+		cancel()
 	})
-	spr.arrowBarrier = spr.form.GetButtonIndex("Save hidden")
-	spr.form.AddButton("Save visible", func() {
-		submit("v")
-		spr.form.Clear(true)
-		spr.root.RemovePage(ModalName)
-		spr.MoveFocusToTable(app)
+	spr.form.AddButton("Delete", func() {
+		deleteColumn()
+		cancel()
 	})
 
 	spr.form.AddButton("Cancel", cancel)
@@ -159,29 +240,28 @@ func (spr *Spur) MakeModeTable(app *tview.Application) error {
 		SetBackgroundColor(spr.FormBackgroundColor).SetSelectable(true))
 
 	spr.modes.SetSelectedFunc(func(row, column int) {
-		spr.mode = spr.modeSet[row]
-		spr.topMenu.GetButton(0).SetLabel("Mode:" + spr.mode)
 		spr.modes.Clear()
 		spr.root.RemovePage(ModalName)
-		app.SetFocus(spr.topMenu)
+		spr.SelectTable(app)
 	})
 	spr.modes.SetDoneFunc(func(key tcell.Key) {
-		if key == tcell.KeyEnter {
-		} else if key == tcell.KeyEscape {
+		if (key == tcell.KeyEnter) || (key == tcell.KeyEscape) {
 			spr.modes.Clear()
 			spr.root.RemovePage(ModalName)
-			app.SetFocus(spr.topMenu)
+			// app.SetFocus(spr.topMenu)
+			spr.SelectTable(app)
 		}
 	})
 	spr.modes.SetSelectionChangedFunc(func(row, column int) {
 		spr.mode = spr.modeSet[row]
-		spr.topMenu.GetButton(0).SetLabel("Mode:" + spr.mode)
+		spr.topMenu.GetButton(1).SetLabel(FirstToUpper(spr.mode))
 		if !spr.isLastEventMouse {
 			return
 		}
 		spr.modes.Clear()
 		spr.root.RemovePage(ModalName)
-		app.SetFocus(spr.topMenu)
+		//app.SetFocus(spr.topMenu)
+		spr.SelectTable(app)
 	})
 
 	spr.modes.SetSelectable(true, true)
@@ -212,14 +292,14 @@ func (spr *Spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 	var oldPasswd, passwd1, passwd2 string
 	createInputs := func() {
 		if needOldPassword {
-			spr.form.AddPasswordField("Old Password:", "", 21, '*', func(s string) {
+			spr.form.AddPasswordField("Old Password:", "", 0, '*', func(s string) {
 				oldPasswd = s
 			})
 		}
-		spr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
+		spr.form.AddPasswordField("New Password:", "", 0, '*', func(s string) {
 			passwd1 = s
 		})
-		spr.form.AddPasswordField("New Password:", "", 21, '*', func(s string) {
+		spr.form.AddPasswordField("New Password:", "", 0, '*', func(s string) {
 			passwd2 = s
 		})
 	}

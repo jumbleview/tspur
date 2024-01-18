@@ -13,7 +13,7 @@ import (
 const hiddenText = " **************** "
 
 // Format used to make table title
-const FmtFieldTitle = "     Field %d     "
+const FmtFieldTitle = "    Column %d     "
 
 func (spr *Spur) ToClipBoard(row int, column int) {
 	if row < 1 || column < 1 {
@@ -87,8 +87,8 @@ func (spr *Spur) Visualize(row int, column int) {
 	}
 }
 
-// UpdateRecords add or update element to the records or delete it if values=nil
-func (spr *Spur) UpdateRecords(key string, values []string, visibility string) int {
+// UpdateRecord add or update element to the records or delete it if values=nil
+func (spr *Spur) UpdateRecord(key string, values []string, visibility string) int {
 	if values == nil { // delete element from the records
 		s := key + " deleted"
 		spr.commits = append(spr.commits, s)
@@ -125,7 +125,7 @@ func (spr *Spur) UpdateRecords(key string, values []string, visibility string) i
 // UpdateTable brings table in accordance with records
 func (spr *Spur) UpdateTable(app *tview.Application) error {
 	spr.table.Clear().SetBorders(true)
-	spr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("#%d", len(spr.records))).
+	spr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("%d Rows", len(spr.records))).
 		SetTextColor(spr.AccentColor).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	spr.table.SetCell(0, 1, tview.NewTableCell("Record Name").
@@ -139,8 +139,8 @@ func (spr *Spur) UpdateTable(app *tview.Application) error {
 	if wmax < 3 {
 		wmax = 3
 	}
-	for c := 0; c < 3; c++ {
-		spr.table.SetCell(0, c+2, tview.NewTableCell(fmt.Sprintf(FmtFieldTitle, c)).
+	for c := 0; c < wmax; c++ {
+		spr.table.SetCell(0, c+2, tview.NewTableCell(fmt.Sprintf(FmtFieldTitle, c+1)).
 			SetTextColor(spr.AccentColor).SetAlign(tview.AlignCenter).
 			SetSelectable(false))
 	}
@@ -182,13 +182,13 @@ func (spr *Spur) MakeBaseTable(app *tview.Application) {
 	spr.table.SetBackgroundColor(spr.MainBackgroundColor)
 	spr.table.SetBordersColor(spr.AccentColor)
 	// Making table title
-	spr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("#24")).
+	spr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("24 Rows")).
 		SetTextColor(spr.AccentColor).SetSelectable(false))
 	spr.table.SetCell(0, 1, tview.NewTableCell("Record Name").
 		SetTextColor(spr.AccentColor).SetAlign(tview.AlignCenter).
 		SetSelectable(false))
 	for i := 0; i < 3; i++ {
-		spr.table.SetCell(0, i+2, tview.NewTableCell(fmt.Sprintf(FmtFieldTitle, i)).
+		spr.table.SetCell(0, i+2, tview.NewTableCell(fmt.Sprintf(FmtFieldTitle, i+1)).
 			SetTextColor(spr.AccentColor).SetAlign(tview.AlignCenter).
 			SetSelectable(false))
 	}

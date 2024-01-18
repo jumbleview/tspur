@@ -4,8 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"unicode"
 
 	"github.com/atotto/clipboard"
@@ -34,7 +36,7 @@ var modeSet [4]string = [4]string{ModeClipEnter, ModeClipSelect, ModeVisibleEnte
 const ArrowDefaultBarrier = -1
 
 // ConsoleWidth is console horizontal dimension
-const ConsoleWidth = 99
+const ConsoleWidth = 109
 
 // ConsoleHeight is console vertical dimension
 const ConsoleHeight = 45
@@ -229,6 +231,8 @@ func main() {
 	tspr.flex.AddItem(tspr.table, 0, TableProportion, false)
 	tspr.root = tspr.root.AddPage("table", tspr.flex, true, true)
 	app.SetFocus(tspr.flex)
+	tspr.activeRow = 1
+	tspr.activeColumn = 1
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		tspr.isLastEventMouse = false
 		if tspr.table.HasFocus() {
@@ -290,6 +294,15 @@ func main() {
 		}
 		return event, action
 	})
+	// To cleanup clipboard when user closes Window with (x)
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		clipboard.WriteAll("")
+		os.Exit(0)
+	}()
+	// To run the App with mouse support enabled
 	app.EnableMouse(true)
 	if err := app.Run(); err != nil {
 		clipboard.WriteAll("")
