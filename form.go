@@ -44,12 +44,11 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 		k = spr.keys[spr.activeRow-1]
 	}
 	makeInputFields := func() {
-		v = nil
 		spr.form.AddInputField("Record Name", k, 0, nil, func(inp string) {
 			k = inp
 		})
 
-		if len(k) > 0 {
+		if len(k) > 0 && v == nil {
 			v = append(v, spr.records[k]...)
 		}
 		for i := 0; i <= count; i++ {
@@ -105,7 +104,8 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 		spr.root.RemovePage(ModalName)
 		spr.MoveFocusToTable(app)
 	})
-	spr.form.AddButton("Hide/Unhide", func() {
+	spr.form.AddButton("Hide/Reveal", func() {
+
 		if vsbl == "h" {
 			vsbl = "v"
 		} else {
@@ -113,7 +113,6 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 		}
 		spr.form.Clear(false)
 		makeInputFields()
-		spr.form.SetFocus(0)
 	})
 
 	spr.form.AddButton("Clear", func() {
@@ -121,7 +120,6 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 		spr.activeRow = -1
 		spr.form.Clear(false)
 		makeInputFields()
-		spr.form.SetFocus(spr.form.GetFormItemIndex("Record Name")) // Does not work?
 	})
 
 	spr.arrowBarrier = spr.form.GetButtonIndex("Submit")
