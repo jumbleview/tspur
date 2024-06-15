@@ -115,7 +115,7 @@ func (v *ColorValues) Set(s string) error {
 		v.Colors = append(v.Colors, color)
 	}
 	if len(v.Colors) != v.Count {
-		return fmt.Errorf("Wrong number of colors: %d vs %d", v.Count, len(v.Colors))
+		return fmt.Errorf("wrong number of colors: %d vs %d", v.Count, len(v.Colors))
 	}
 	return nil
 }
@@ -141,7 +141,7 @@ func (v *ModeValue) Set(s string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("Mode %s is uknown", s)
+	return fmt.Errorf("mode %s is uknown", s)
 }
 
 // tspur is cheat sheet table.
@@ -151,7 +151,7 @@ func (v *ModeValue) Set(s string) error {
 func main() {
 	greeting := "tsupr.exe path_to_data_file"
 	var Usage = func() {
-		fmt.Fprintf(os.Stderr, greeting)
+		fmt.Fprintln(os.Stderr, greeting)
 	}
 
 	var mainColors ColorValues
@@ -187,13 +187,13 @@ func main() {
 	tspr.modeSet = &modeSet
 	tspr.mode = tsprMode.Mode
 	tspr.modeIndex = tsprMode.Index
-	var theme = SpurTheme{ // Default is close to popular DOS file manager Norton
+	var theme = SpurTheme{ // Default is Monochrome theme with red accent for visited celln
 		MainColor:                tcell.ColorWhite,
-		MainBackgroundColor:      tcell.ColorDarkBlue,
+		MainBackgroundColor:      tcell.ColorBlack,
 		TrackingColor:            tcell.ColorRed,
 		FormColor:                tcell.ColorWhite,
-		FormBackgroundColor:      tcell.ColorDarkCyan,
-		FormInputBackgroundColor: tcell.ColorDarkBlue,
+		FormBackgroundColor:      tcell.ColorGrey,
+		FormInputBackgroundColor: tcell.ColorBlack,
 	}
 
 	if len(mainColors.Colors) == 2 {
@@ -295,7 +295,7 @@ func main() {
 		return event, action
 	})
 	// To cleanup clipboard when user closes Window with (x)
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c

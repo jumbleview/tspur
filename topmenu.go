@@ -74,8 +74,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		if spr.activeRow > 0 {
 			key = spr.keys[spr.activeRow-1]
 		}
-		if spr.activeColumn > 1 {
-			url = spr.records[key][spr.activeColumn-2]
+		urlIndex := spr.activeColumn - 2
+		if urlIndex >= 0 && urlIndex < len(spr.records[key]) {
+			url = spr.records[key][urlIndex]
 		}
 
 		if len(url) > 0 {

@@ -351,7 +351,7 @@ func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 	SetFormColors(spr.form, spr.FormBackgroundColor, spr.FormInputBackgroundColor, spr.FormColor)
 	var passwd string
 	createInputs := func() {
-		spr.form.AddPasswordField("", "", 21, '*', func(s string) {
+		spr.form.AddPasswordField("", "", 0, '*', func(s string) {
 			passwd = s
 		})
 	}
