@@ -244,20 +244,6 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		needOldPassword := true
 		spr.MakeNewPasswordForm(app, " Change page password ", needOldPassword)
 	})
-	/*
-		spr.topMenu.AddButton("Column", func() {
-			spr.Hide(spr.activeRow, spr.activeColumn)
-			spr.table.SetSelectable(false, false)
-
-			spr.activeRow = -1
-			spr.MakeColumnForm(app, "h")
-			modal := CompoundModal(spr.form, 42, 7)
-			spr.root = spr.root.AddPage(ModalName, modal, true, true)
-			app.SetRoot(spr.root, true)
-			app.SetFocus(modal)
-
-		})
-	*/
 	spr.topMenu.AddButton("Exit", func() {
 		saveLabel := spr.topMenu.GetButton(spr.saveMenuInx).GetLabel()
 		if saveLabel == "Save" { // nothing to save. Just exit

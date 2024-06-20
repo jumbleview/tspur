@@ -149,33 +149,35 @@ func (v *ModeValue) Set(s string) error {
 // Each row consists of key and some values
 
 func main() {
-	greeting := "tsupr.exe path_to_data_file"
+	greeting := "tsupr.exe [-cm] [-cf] [-ct] [-md] [-ta] path_to_data_file"
 	var Usage = func() {
 		fmt.Fprintln(os.Stderr, greeting)
 	}
 
 	var mainColors ColorValues
 	mainColors.Count = 2
-	flag.Var(&mainColors, "cm", "two comma separated  colors: font & background")
+	flag.Var(&mainColors, "cm", "Colors main: two comma separated  colors: font & background")
 
 	var formColors ColorValues
 	formColors.Count = 3
-	flag.Var(&formColors, "cf", "three comma separated  colors: font, background, & input backgorund")
+	flag.Var(&formColors, "cf", "Colors formthree comma separated  colors: font, background, & input backgorund")
 
 	var trackingColor ColorValues
 	trackingColor.Count = 1
-	flag.Var(&trackingColor, "ct", "single color: font")
+	flag.Var(&trackingColor, "ct", "Color trace: single color: font")
 
 	var tsprMode ModeValue
 	var modes []string
 	for _, m := range modeSet {
 		modes = append(modes, m)
 	}
-	possibleModes := "possible values are: " + strings.Join(modes, ",")
+	possibleModes := "Mode: possible values are: " + strings.Join(modes, ",")
 
 	flag.Var(&tsprMode, "md", possibleModes)
 
-	flag.String("h", "help", greeting)
+	var alterColumn int
+	flag.IntVar(&alterColumn, "ta", 0, "Table altering: n > 0 - column  to insert before n; n < 0 - column to delete at -n")
+
 	flag.Parse()
 	cmd := flag.Args()
 	if len(cmd) != 1 {
@@ -187,12 +189,12 @@ func main() {
 	tspr.modeSet = &modeSet
 	tspr.mode = tsprMode.Mode
 	tspr.modeIndex = tsprMode.Index
-	var theme = SpurTheme{ // Default is Monochrome theme with red accent for visited celln
+	var theme = SpurTheme{ // Default is Monochrome theme with red accent for visited cell
 		MainColor:                tcell.ColorWhite,
 		MainBackgroundColor:      tcell.ColorBlack,
 		TrackingColor:            tcell.ColorRed,
 		FormColor:                tcell.ColorWhite,
-		FormBackgroundColor:      tcell.ColorGrey,
+		FormBackgroundColor:      tcell.ColorGray,
 		FormInputBackgroundColor: tcell.ColorBlack,
 	}
 
@@ -272,7 +274,7 @@ func main() {
 		return event
 	})
 	if errFile == nil {
-		tspr.MakeEnterPasswordForm(app, "Enter Password:")
+		tspr.MakeEnterPasswordForm(app, "Enter Password:", alterColumn)
 	} else {
 		_, errFile = os.Stat(tspr.cribPath)
 		if errFile != nil {

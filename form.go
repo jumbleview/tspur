@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/atotto/clipboard"
@@ -43,7 +44,7 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 	if spr.activeRow > 0 {
 		k = spr.keys[spr.activeRow-1]
 	}
-	makeInputFields := func() {
+	makeInputFields := func(isEmpty bool) {
 		spr.form.AddInputField("Record Name", k, 0, nil, func(inp string) {
 			k = inp
 		})
@@ -68,14 +69,18 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 				v[locali] = inp
 				clipboard.WriteAll(inp)
 			}
+			value := v[i]
+			if isEmpty {
+				value = ""
+			}
 			if vsbl == "h" {
-				spr.form.AddPasswordField(valName, v[i], 0, '*', changed)
+				spr.form.AddPasswordField(valName, value, 0, '*', changed)
 			} else {
-				spr.form.AddInputField(valName, v[i], 0, accepted, changed)
+				spr.form.AddInputField(valName, value, 0, accepted, changed)
 			}
 		}
 	}
-	makeInputFields()
+	makeInputFields(false)
 	cancel := func() {
 		spr.form.Clear(true)
 		spr.root.RemovePage(ModalName)
@@ -112,14 +117,14 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 			vsbl = "h"
 		}
 		spr.form.Clear(false)
-		makeInputFields()
+		makeInputFields(false)
 	})
 
 	spr.form.AddButton("Clear", func() {
 		k = ""
 		spr.activeRow = -1
 		spr.form.Clear(false)
-		makeInputFields()
+		makeInputFields(true)
 	})
 
 	spr.arrowBarrier = spr.form.GetButtonIndex("Submit")
@@ -346,7 +351,7 @@ func (spr *Spur) MakeNewPasswordForm(app *tview.Application, title string, needO
 }
 
 // MakeEnterPasswordForm makes tspr page with Form to enter page password
-func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) error {
+func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string, alterColumn int) error {
 	spr.form = tview.NewForm()
 	SetFormColors(spr.form, spr.FormBackgroundColor, spr.FormInputBackgroundColor, spr.FormColor)
 	var passwd string
@@ -358,7 +363,7 @@ func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 	pwdSubmit := func() {
 		data, err := DecryptFile(spr.cribName, passwd)
 		if err == nil {
-			spr.AttachData(data, passwd)
+			spr.AttachData(data, passwd, alterColumn)
 			spr.UpdateTable(app)
 			spr.activeRow = 1
 			spr.activeColumn = 1
@@ -377,13 +382,12 @@ func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 			spr.form.Clear(true)
 			spr.root.RemovePage(ModalName)
 			title = " Wrong password. Repeat "
-			spr.MakeEnterPasswordForm(app, title)
+			spr.MakeEnterPasswordForm(app, title, alterColumn)
 		}
 	}
 	createInputs()
 	cancel := func() {
 		app.Stop()
-		return
 	}
 	spr.form.AddButton("Submit", pwdSubmit)
 	spr.form.AddButton("Cancel", cancel)
@@ -392,6 +396,7 @@ func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string) err
 	pwdFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 	pwdFlex.AddItem(spr.form, 0, 2, true)
 	pwdFlex.SetBackgroundColor(spr.FormBackgroundColor)
+	title = fmt.Sprintf("%s %d", title, alterColumn)
 	pwdFlex.SetTitle(title)
 	pwdFlex.SetBorder(true)
 	modal := CompoundModal(pwdFlex, 27, 7)

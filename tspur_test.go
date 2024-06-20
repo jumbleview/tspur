@@ -21,8 +21,9 @@ func TestSave(t *testing.T) {
 	if err != nil {
 		t.Errorf("Decrypt inital file: %s", err)
 	}
+	// fmt.Print(string(data))
 	var tspr Spur
-	tspr.AttachData(data, pswd)
+	tspr.AttachData(data, pswd, 0)
 	tspr.cribName = storageBis
 	tspr.Save()
 	dataBis, err := DecryptFile(storageBis, pswd)

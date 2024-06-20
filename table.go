@@ -34,7 +34,7 @@ func (spr *Spur) ToClipBoard(row int, column int) {
 }
 
 // AttachData initialize spur and attaches data to it
-func (spr *Spur) AttachData(data []byte, pswd string) {
+func (spr *Spur) AttachData(data []byte, pswd string, columnToAlter int) {
 	spr.passwd = pswd
 	var sdata []string
 	spr.records = make(map[string][]string)
@@ -46,8 +46,22 @@ func (spr *Spur) AttachData(data []byte, pswd string) {
 	for _, s := range sdata {
 		// parse string as csv
 		elems := strings.Split(s, ",")
+		// elem[0]] is visibility and elem[1] is key. The rest are values
 		if len(elems) > 1 {
 			values := elems[2:]
+			if (columnToAlter > 0) && (columnToAlter <= len(values)) {
+				// insert empty str  by index
+				values = append(values, "")
+				copy(values[columnToAlter:], values[columnToAlter-1:])
+				values[columnToAlter-1] = ""
+			} else if columnToAlter < 0 {
+				// remove str  by index
+				columnToRemove := -columnToAlter - 1
+				if columnToRemove < len(values) {
+					values = append(values[:columnToRemove], values[columnToRemove+1:]...)
+				}
+
+			}
 			spr.keys = append(spr.keys, elems[1])
 			if len(values) > spr.width {
 				spr.width = len(values)
@@ -147,10 +161,10 @@ func (spr *Spur) UpdateTable(app *tview.Application) error {
 	for r := 0; r < len(spr.keys); r++ {
 		key := spr.keys[r]
 		spr.table.SetCell(r+1, 0, tview.NewTableCell(fmt.Sprintf("%d", r+1)).
-			SetTextColor(spr.MainColor).
+			SetTextColor(spr.MainColor).SetBackgroundColor(spr.MainBackgroundColor).
 			SetAlign(tview.AlignCenter).SetSelectable(false))
 		spr.table.SetCell(r+1, 1, tview.NewTableCell(key).
-			SetTextColor(spr.MainColor).
+			SetTextColor(spr.MainColor).SetBackgroundColor(spr.MainBackgroundColor).
 			SetAlign(tview.AlignCenter).SetSelectable(true))
 		values := spr.records[key]
 		for c := 0; c < width; c++ {
@@ -168,7 +182,7 @@ func (spr *Spur) UpdateTable(app *tview.Application) error {
 				}
 			}
 			spr.table.SetCell(r+1, c+2, tview.NewTableCell(tblValue).
-				SetTextColor(spr.MainColor).
+				SetTextColor(spr.MainColor).SetBackgroundColor(spr.MainBackgroundColor).
 				SetAlign(tview.AlignCenter).SetSelectable(true))
 		}
 	}
@@ -182,7 +196,7 @@ func (spr *Spur) MakeBaseTable(app *tview.Application) {
 	spr.table.SetBackgroundColor(spr.MainBackgroundColor)
 	spr.table.SetBordersColor(spr.AccentColor)
 	// Making table title
-	spr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("24 Rows")).
+	spr.table.SetCell(0, 0, tview.NewTableCell(fmt.Sprintf("%d Rows", 24)).
 		SetTextColor(spr.AccentColor).SetSelectable(false))
 	spr.table.SetCell(0, 1, tview.NewTableCell("Record Name").
 		SetTextColor(spr.AccentColor).SetAlign(tview.AlignCenter).
@@ -197,7 +211,7 @@ func (spr *Spur) MakeBaseTable(app *tview.Application) {
 	const width = 3
 	for r := 0; r < hight; r++ {
 		spr.table.SetCell(r+1, 0, tview.NewTableCell(fmt.Sprintf("%d", r+1)).
-			SetTextColor(spr.MainColor).
+			SetTextColor(spr.MainColor).SetBackgroundColor(spr.MainBackgroundColor).
 			SetAlign(tview.AlignCenter).SetSelectable(false))
 		for j := 1; j <= width; j++ {
 			spr.table.SetCell(r+1, j, tview.NewTableCell(hiddenText).
