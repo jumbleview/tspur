@@ -11,6 +11,9 @@ import (
 )
 
 func (spr *Spur) SelectTable(app *tview.Application) {
+	if len(spr.keys) == 0 {
+		return
+	}
 	spr.MoveFocusToTable(app)
 	row, col := spr.table.GetSelection()
 	// if row < 1 || col < 1 {
@@ -50,7 +53,9 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 	})
 
 	spr.topMenu.AddButton("Select", func() {
-		spr.SelectTable(app)
+		if len(spr.keys) > 0 {
+			spr.SelectTable(app)
+		}
 	})
 
 	spr.topMenu.SetBackgroundColor(spr.MainBackgroundColor)
@@ -71,7 +76,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 
 		modal := spr.MakeNewModal()
 		var key, url string
-		if spr.activeRow > 0 {
+		if spr.activeRow > 0 && len(spr.keys) > 0 {
 			key = spr.keys[spr.activeRow-1]
 		}
 		urlIndex := spr.activeColumn - 2
@@ -106,25 +111,13 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 		app.SetFocus(modal)
 
 	})
-	/*
-		spr.topMenu.AddButton("Add", func() {
-			spr.Hide(spr.activeRow, spr.activeColumn)
-			spr.table.SetSelectable(false, false)
 
-			spr.activeRow = -1
-			spr.MakeForm(app, "h")
-			modal := CompoundModal(spr.form, 45, 19)
-			spr.root = spr.root.AddPage(ModalName, modal, true, true)
-			app.SetRoot(spr.root, true)
-			app.SetFocus(modal)
-		})
-	*/
 	spr.topMenu.AddButton("Edit", func() {
 		spr.Hide(spr.activeRow, spr.activeColumn)
 		spr.table.SetSelectable(false, false)
 
 		visibility := "v"
-		if spr.activeRow > 0 {
+		if (spr.activeRow > 0) && (len(spr.keys) > 0) {
 			visibility = spr.visibility[spr.keys[spr.activeRow-1]]
 		}
 		spr.MakeForm(app, visibility)
@@ -141,7 +134,7 @@ func (spr *Spur) MakeTopMenu(app *tview.Application) error {
 
 		modal := spr.MakeNewModal()
 		var key string
-		if spr.activeRow > 0 {
+		if spr.activeRow > 0 && len(spr.keys) > 0 {
 			key = spr.keys[spr.activeRow-1]
 		}
 		if len(key) > 0 {

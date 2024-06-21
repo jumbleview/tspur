@@ -74,7 +74,7 @@ func (spr *Spur) AttachData(data []byte, pswd string, columnToAlter int) {
 
 func (spr *Spur) Hide(row int, column int) {
 	if row < 1 || column < 2 {
-		return // nothing ot do: hever hide key
+		return // nothing ot do: never hide key
 	}
 	key := spr.keys[row-1]
 	if spr.visibility[key] != "h" {

@@ -41,7 +41,7 @@ func (spr *Spur) MakeForm(app *tview.Application, vsbl string) error {
 	}
 	var k string
 	var v []string
-	if spr.activeRow > 0 {
+	if spr.activeRow > 0 && len(spr.keys) > 0 {
 		k = spr.keys[spr.activeRow-1]
 	}
 	makeInputFields := func(isEmpty bool) {
@@ -376,8 +376,11 @@ func (spr *Spur) MakeEnterPasswordForm(app *tview.Application, title string, alt
 
 			spr.form.Clear(true)
 			spr.root.RemovePage(ModalName)
-			spr.MoveFocusToTable(app)
-			// app.SetFocus(spr.topMenu)
+			if len(spr.keys) > 0 {
+				spr.MoveFocusToTable(app)
+			} else {
+				app.SetFocus(spr.topMenu)
+			}
 		} else {
 			spr.form.Clear(true)
 			spr.root.RemovePage(ModalName)

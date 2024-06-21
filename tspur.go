@@ -176,7 +176,7 @@ func main() {
 	flag.Var(&tsprMode, "md", possibleModes)
 
 	var alterColumn int
-	flag.IntVar(&alterColumn, "ta", 0, "Table altering: n > 0 - column  to insert before n; n < 0 - column to delete at -n")
+	flag.IntVar(&alterColumn, "ta", 0, "Table altering: n > 0 - column  to insert before n; n < 0 - to delete column -n")
 
 	flag.Parse()
 	cmd := flag.Args()
