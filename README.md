@@ -13,9 +13,24 @@ Terminal screen consists of two areas:
 * Top menu
 * Table with User Records
 
-Application starts with single argument: path to the file with data storage. Storage is encoded and password protected. If such a storage does not exists, application will ask you to enter the new password and  will create a new storage.
+Application starts with some optional flags and single argument: path to the file with data storage. Storage is encoded and password protected. If such a storage does not exists, application will ask you to enter the new password and  will create a new storage.
 
-At start application puts focus on the top menu. Hitting "Enter", while button "Select" is in focus, move the focus to the table.  To put focus  back on the top menu use "Esc".To navigate through the menu or the table use arrow keys. When table is in focus you may select row by hitting letter button which corresponds to the letter from which Record Name starts. 
+## Flags
+
+Three flags defines color pallette att the application start. Color values are strings taken from map ColorNames in file color.go of packag tcell.
+
+* Flag -cm  ( Colors Main ). It is comma separated list of two elemnts: color of the table font and color of the table background.
+
+* Flag -cf  ( Colors of form). It is comma separated list of three elemnts: color of the forms font, color color of the form background, and color of background of forms input fields.
+
+* Flag -ct (Color trace). Color of font which denotes cells choosen by Enter key or mouse click duirng current session.
+
+* Flag -md (Mode). It defines mode with which application starts. (See section Application Modes)
+
+* Flag -ta (Table altering). It is integer number. It defines if new columns needs to be inserted  at start and in wich place. If negative,it denotes which column to delete.
+
+
+At start application puts focus on the first row, first cell of the table.  To navigate through the table use arrow keys or make mouse click. When table is in focus you may select row by hitting letter button which corresponds to the letter from which Record Name starts.  To put focus   on the top menu use "Esc" or select menu button with mouse click. Hitting "Enter", while button "Select" is in focus, move the focus back to the table. 
 
 Number of table rows and columns is unlimited but it is unlikely somebody will use more than hundred rows or more then 3..5 columns. Each rows contains one cell (Record Name), which is always visible, and several values. Values on each row may be either all visible or all hidden.
 
@@ -35,7 +50,7 @@ Application supports four modes:
 
 ## Entering the Data
 
-User may add new records (button "Add") or edit existing (button "Edit"). To edit existing record select record on the table, then by "Esc" go to the top menu and hit button "Edit". Record maybe extended with one extra value. If there is need to add several extra values repeat the process several times.
+User may eddit  edit existing (button "Edit"). To edit existing record select record on the table, then by "Esc" go to the top menu and hit button "Edit". Record maybe extended with one extra value. If there is need to add several extra values repeat the process several times. To add new record use button "Edit" and change key value. Edit form allows to change from vsible to hidden and vice versa.
 
 ![TSPUR_EDIT](./images/tspur_edit.png)
 
@@ -69,6 +84,7 @@ To build executable and run the demo:
 * Invoke either start.bat (Windows) or start.sh (Linux). As the password enter word "password".
 
 ## Git integration
+![TSPUR_GIT](./images/tspur_GIT.png)
 Optional and limited integration with Git does exists. It provides chain git operations on modified encoded storage, namely:
 * At Start "tspur" checks if storage lays in the directory with valid git working tree.
 * If above is "true" button "Git" included in to the top menu.
