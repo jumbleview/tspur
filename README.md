@@ -84,7 +84,7 @@ To build executable and run the demo:
 * Invoke either start.bat (Windows) or start.sh (Linux). As the password enter word "password".
 
 ## Git integration
-![TSPUR_GIT](./images/tspur_GIT.png)
+![TSPUR_GIT](./images/tspur_git.png)
 Optional and limited integration with Git does exists. It provides chain git operations on modified encoded storage, namely:
 * At Start "tspur" checks if storage lays in the directory with valid git working tree.
 * If above is "true" button "Git" included in to the top menu.
