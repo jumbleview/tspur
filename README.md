@@ -1,20 +1,15 @@
 # tspur
-
+![TSPUR](./images/tspur.png)
 TSPUR is the terminal application  with some user records presented as a table. I personally use it as cheat sheet (to keep my various usernames and passwords  together with some useful facts and reminders).
 
-![TSPUR](./images/tspur.png)
-
 ## General Description
-
 Terminal screen consists of two areas:
-
 * Top menu
 * Table with User Records
 
 Application starts with some optional flags and single argument: path to the file with data storage. Storage is encoded and password protected. If such a storage does not exists, application will ask you to enter the new password and  will create a new storage.
 
 ## Flags
-
 Three flags defines color pallette att the application start. Color values are strings taken from map ColorNames in file color.go of packag tcell.
 
 * Flag -cm  ( Colors Main ). It is comma separated list of two elemnts: color of the table font and color of the table background.
@@ -36,7 +31,6 @@ Number of table rows and columns is unlimited but it is unlikely somebody will u
 ## Top Menu Button Functions
 
 ### Select
-
 Pusin ghtis button move focs from the top menu to table area
 
 
@@ -59,8 +53,11 @@ This button treats content of the table active cell as URL and propose to open b
 ![TSPUR_EDIT](./images/tspur_edit.png)
 To edit existing record select record on the table, then by "Esc" go to the top menu and hit button "Edit". Edit form  apers o the screen, Record may be extended with one extra value. If there is need to add several extra values repeat the process several times. To add new record use button "Edit" and change key value. Edit form allows to change record content from visible to hidden and vice versa.
 
+### Delete
+Button propose to delete table record withcurrent active cell
+
 ### Save
-Modified content of hte table is saved on the disk
+Buton saves Modified content of tTe table on the disk
 
 ### Git
 ![TSPUR_GIT](./images/tspur_git.png)
@@ -72,8 +69,7 @@ Optional and limited integration with Git does exists. It provides chain git ope
 Integration does not use any Go git package, just invokes consol operation of  "git" commands. Setting the account with Git provider, creating remote directory (most likely private) etc. is out of scope for this application.
 
 ## Dependencies
-
-It is pure Go application (no cgo needed). All the heavy lifting is done by three imported packages (and their dependencies):
+It is pure Go application (no cgo needed). All heavy lifting is done by three imported packages (and their dependencies):
 
 	"github.com/rivo/tview"
 	"github.com/gdamore/tcell/v2"
@@ -84,9 +80,7 @@ It is pure Go application (no cgo needed). All the heavy lifting is done by thre
 On Linux there is need to install "xclip", otherwise clipboard operations will not work.
 
 ## Platform Support
-
 Code was developed on Windows 10. On Windows 11 it wokrs, but instead  of default Windows Terminal  usage of conhost is recomended .  Linux (Ubuntu 18.04) seems to be OK (just don't forget to install "xclip").  For MAC code compiles but nobody tried it.
-
 
 ## Demo
 To build executable and run the demo:
@@ -98,7 +92,4 @@ To build executable and run the demo:
 * Invoke either start.bat (Windows) or start.sh (Linux). As the password enter word "password".
 
 ## Known problem
-
 On Windows, if size of the terminal windows is changed dynamically (by dragging console corner with mouse, for example), structure of the table becomes broken. You can fix it by going back and force between top menu and the table.
-
-
