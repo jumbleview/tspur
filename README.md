@@ -31,19 +31,14 @@ Number of table rows and columns is unlimited but it is unlikely somebody will u
 ## Top Menu Button Functions
 
 ### Select
-Pusin ghtis button move focs from the top menu to table area
-
+Select button move focus from the top menu to table area
 
 ### Button with Application Modes
 ![TSPUR_MODE](./images/tspur_mode.png)
 Application supports four modes:
-
 * Clipboard-on-Enter. If user hits "Enter" on selected cell  its content is copied into clipboard.
-
 * Clipboard-on-Select. During navigation content of selected cell is copied into clipboard.
-
 * Visible-on-Enter. If user hits "Enter" on selected cell with hidden content it becomes visible.  When cell becomes unselected its contents becomes hidden again. 
-
 * Visible-on-Select. If user selects cell with hidden content it becomes visible. When cell becomes unselected its contents becomes hidden again. 
 
 ### WWW
@@ -70,13 +65,10 @@ Integration does not use any Go git package, just invokes consol operation of  "
 
 ## Dependencies
 It is pure Go application (no cgo needed). All heavy lifting is done by three imported packages (and their dependencies):
-
-	"github.com/rivo/tview"
-	"github.com/gdamore/tcell/v2"
-	"github.com/atotto/clipboard"
-
+* "github.com/rivo/tview"
+* "github.com/gdamore/tcell/v2"
+* "github.com/atotto/clipboard"
 (Code of this application is mostly tweaking around "tview" widgets.)
-
 On Linux there is need to install "xclip", otherwise clipboard operations will not work.
 
 ## Platform Support
